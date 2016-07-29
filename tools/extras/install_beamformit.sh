@@ -3,7 +3,7 @@
 # Installs beamformit from the location https://github.com/xanguera/BeamformIt
 
 # libsndfile needed by beamformit,
-wget http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.25.tar.gz
+wget -c http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.25.tar.gz
 tar xvf libsndfile-1.0.25.tar.gz 
 ( 
 cd libsndfile-1.0.25;
