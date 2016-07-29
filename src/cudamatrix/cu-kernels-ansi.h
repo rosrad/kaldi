@@ -87,6 +87,10 @@ void cudaF_mul_cols_vec(dim3 Gr, dim3 Bl, float *mat, const float *scale, Matrix
 void cudaF_mul_rows_vec(dim3 Gr, dim3 Bl, float *mat, const float *scale, MatrixDim d);
 void cudaF_mul_rows_group_mat(dim3 Gr, dim3 Bl, float *y, const float *x, MatrixDim d, int src_stride, int group_size);
 void cudaF_calc_pnorm_deriv(dim3 Gr, dim3 Bl, float *y, const float *x1, const float *x2,  MatrixDim d, int src_stride, int group_size, float power);
+void cudaF_diff_group_pnorm(dim3 Gr, dim3 Bl, float *id, const float *iv,
+                            const float *ov, const float* od, MatrixDim id_dim,
+                            int iv_stride, int ov_stride, int od_stride,
+                            int group_size, float power);
 void cudaF_calc_group_max_deriv(dim3 Gr, dim3 Bl, float *y, const float *x1, const float *x2,  MatrixDim d, int src_stride, int group_size);
 void cudaF_div_rows_vec(dim3 Gr, dim3 Bl, float *mat, const float *vec_div, MatrixDim d);
 void cudaF_add_mat(dim3 Gr, dim3 Bl, float alpha, const float *src, float *dst, MatrixDim d, int src_stride, int A_trans);
@@ -104,8 +108,10 @@ void cudaF_min_mat_cols(int Gr, int Bl, float* result, const float* mat, const M
 void cudaF_sum_mat_cols(int Gr, int Bl, float* result, const float* mat, const MatrixDim d);
 void cudaF_replace_value(int Gr, int Bl, float *v, int dim, float orig, float changed);
 void cudaF_set_bias_params(int Gr, int Bl, float* v, const float* a, float param_1, float param_2, float param_3, int* flag, int dim);
-void cudaF_copy_from_vec_df(int Gr, int Bl, double* v_out, const float* v_in, int dim);
-void cudaF_copy_from_vec_fd(int Gr, int Bl, float* v_out, const float* v_in, int dim);
+void cublas_copy_kaldi_fd(int Gr, int Bl, int n, const float* x,
+    int incx, double* y, int incy);
+void cublas_copy_kaldi_df(int Gr, int Bl, int n, const double* x,
+    int incx, float* y, int incy);
 void cudaF_vec_mul_elements(int Gr, int Bl, float* v, const float* a, int dim);
 void cudaF_vec_soft_max(int Gr, int Bl, float* v, int dim);
 void cudaF_vec_min(int Gr, int Bl, const float* v, float* value, int dim, int inc);
@@ -142,6 +148,9 @@ void cudaF_softmax_reduce(size_t Gr, size_t Bl, float *y, const float *x, Matrix
 void cudaF_log_softmax_reduce(size_t Gr, size_t Bl, float *y, const float *x, MatrixDim d, int src_stride);
 void cudaF_soft_hinge(dim3 Gr, dim3 Bl, float *y, const float *x, MatrixDim d, int src_stride);
 void cudaF_group_pnorm(dim3 Gr, dim3 Bl, float *y, const float *x, MatrixDim d, int src_stride, int group_size, float power);
+void cudaF_group_spec_pnorm(dim3 Gr, dim3 Bl, float *y, const float *x,
+                            MatrixDim d, int src_stride, int group_size,
+                            float power);
 void cudaF_group_max(dim3 Gr, dim3 Bl, float *y, const float *x, MatrixDim d, int src_stride, int group_size);
 void cudaF_sigmoid(dim3 Gr, dim3 Bl, float *y, const float *x, MatrixDim d, int src_stride);
 void cudaF_heaviside(dim3 Gr, dim3 Bl, float *y, const float *x, MatrixDim d, int src_stride);
@@ -152,6 +161,9 @@ void cudaF_diff_tanh(dim3 Gr, dim3 Bl, float *eout, const float *e, const float 
 void cudaF_regularize_l1(dim3 Gr, dim3 Bl, float *wei, float *grad, float l1, float lr, MatrixDim d, int stride_grad);
 void cudaF_find_row_max_id(dim3 Gr, dim3 Bl, const float *mat, float *vec_val, int32_cuda *vec_id, MatrixDim d);
 void cudaF_diff_xent(dim3 Gr, dim3 Bl, const int32_cuda *vec_tgt, float *mat_net_out, float *vec_log_post, MatrixDim d);
+void cudaF_diff_softmax(dim3 Gr, dim3 Bl, float* x, const MatrixDim dim,
+                        const float* value, const int value_stride,
+                        const float* diff, const int diff_stride);
 void cudaF_copy_rows_from_vec(dim3 Gr, dim3 Bl, float *mat_out, MatrixDim d_out, const float *v_in);
 
 void cudaF_randomize(dim3 Gr, dim3 Bl, float *y, const float *x, const int32_cuda *copy_from, MatrixDim d_out, MatrixDim d_in);
@@ -228,6 +240,10 @@ void cudaD_mul_cols_vec(dim3 Gr, dim3 Bl, double *mat, const double *scale, Matr
 void cudaD_mul_rows_vec(dim3 Gr, dim3 Bl, double *mat, const double *scale, MatrixDim d);
 void cudaD_mul_rows_group_mat(dim3 Gr, dim3 Bl, double *y, const double *x, MatrixDim d, int src_stride, int group_size);
 void cudaD_calc_pnorm_deriv(dim3 Gr, dim3 Bl, double *y, const double *x1, const double *x2,  MatrixDim d, int src_stride, int group_size, double power);
+void cudaD_diff_group_pnorm(dim3 Gr, dim3 Bl, double *id, const double *iv,
+                            const double *ov, const double* od,
+                            MatrixDim id_dim, int iv_stride, int ov_stride,
+                            int od_stride, int group_size, double power);
 void cudaD_calc_group_max_deriv(dim3 Gr, dim3 Bl, double *y, const double *x1, const double *x2,  MatrixDim d, int src_stride, int group_size);
 void cudaD_div_rows_vec(dim3 Gr, dim3 Bl, double *mat, const double *vec_div, MatrixDim d);
 void cudaD_add_mat(dim3 Gr, dim3 Bl, double alpha, const double *src, double *dst, MatrixDim d, int src_stride, int A_trans);
@@ -246,8 +262,6 @@ void cudaD_min_mat_cols(int Gr, int Bl, double* result, const double* mat, const
 void cudaD_sum_mat_cols(int Gr, int Bl, double* result, const double* mat, const MatrixDim d);
 void cudaD_replace_value(int Gr, int Bl, double *v, int dim, double orig, double changed);
 void cudaD_set_bias_params(int Gr, int Bl, double* v, const double* a, double param_1, double param_2, double param_3, int* flag, int dim);
-void cudaD_copy_from_vec_df(int Gr, int Bl, double* v_out, const double* v_in, int dim);
-void cudaD_copy_from_vec_fd(int Gr, int Bl, float* v_out, const double* v_in, int dim);
 void cudaD_vec_mul_elements(int Gr, int Bl, double* v, const double* a, int dim);
 void cudaD_vec_soft_max(int Gr, int Bl, double* v, int dim);
 void cudaD_vec_min(int Gr, int Bl, const double* v, double* value, int dim, int inc);
@@ -286,6 +300,9 @@ void cudaD_softmax_reduce(size_t Gr, size_t Bl, double *y, const double *x, Matr
 void cudaD_log_softmax_reduce(size_t Gr, size_t Bl, double *y, const double *x, MatrixDim d, int src_stride);
 void cudaD_soft_hinge(dim3 Gr, dim3 Bl, double *y, const double *x, MatrixDim d, int src_stride);
 void cudaD_group_pnorm(dim3 Gr, dim3 Bl, double *y, const double *x, MatrixDim d, int src_stride, int group_size, double power);
+void cudaD_group_spec_pnorm(dim3 Gr, dim3 Bl, double *y, const double *x,
+                            MatrixDim d, int src_stride, int group_size,
+                            double power);
 void cudaD_group_max(dim3 Gr, dim3 Bl, double *y, const double *x, MatrixDim d, int src_stride, int group_size);
 void cudaD_sigmoid(dim3 Gr, dim3 Bl, double *y, const double *x, MatrixDim d, int src_stride);
 void cudaD_heaviside(dim3 Gr, dim3 Bl, double *y, const double *x, MatrixDim d, int src_stride);
@@ -296,6 +313,9 @@ void cudaD_diff_tanh(dim3 Gr, dim3 Bl, double *eout, const double *e, const doub
 void cudaD_regularize_l1(dim3 Gr, dim3 Bl, double *wei, double *grad, double l1, double lr, MatrixDim d, int stride_grad);
 void cudaD_find_row_max_id(dim3 Gr, dim3 Bl, const double *mat, double *vec_val, int32_cuda *vec_id, MatrixDim d);
 void cudaD_diff_xent(dim3 Gr, dim3 Bl, const int32_cuda *vec_tgt, double *mat_net_out, double *vec_log_post, MatrixDim d);
+void cudaD_diff_softmax(dim3 Gr, dim3 Bl, double* x, const MatrixDim dim,
+                        const double* value, const int value_stride,
+                        const double* diff, const int diff_stride);
 void cudaD_copy_rows_from_vec(dim3 Gr, dim3 Bl, double *mat_out, MatrixDim d_out, const double *v_in);
 
 void cudaD_randomize(dim3 Gr, dim3 Bl, double *y, const double *x, const int32_cuda *copy_from, MatrixDim d_out, MatrixDim d_in);
