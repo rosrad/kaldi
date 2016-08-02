@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
       // line. There must be 4 fields--segment name , reacording wav file name,
       // start time, end time; 5th field (channel info) is optional.
       SplitStringToVector(line, " \t\r", true, &split_line);
-      if (split_line.size() != 4 && split_line.size() != 5) {
+      if (split_line.size() < 4 || split_line.size() > 6 ) {
         KALDI_WARN << "Invalid line in segments file: " << line;
         continue;
       }
@@ -111,13 +111,21 @@ int main(int argc, char *argv[]) {
                    << line;
         continue;
       }
-      int32 channel = -1;  // means channel info is unspecified.
+      int32 start_chan = -1;  // means channel info is unspecified.
+      int32 end_chan=-1;
       // if each line has 5 elements then 5th element must be channel identifier
-      if (split_line.size() == 5) {
-        if (!ConvertStringToInteger(split_line[4], &channel) || channel < 0) {
-          KALDI_WARN << "Invalid line in segments file [bad channel]: " << line;
-          continue;
-        }
+
+      switch (split_line.size()) {
+          case 6:
+              if (!ConvertStringToInteger(split_line[5], &end_chan) || end_chan < end_chan) {
+                  KALDI_WARN << "Invalid line in segments file [bad channel]: " << line;
+                  continue;
+              }
+          case 5:
+              if (!ConvertStringToInteger(split_line[4], &start_chan) || start_chan < 0) {
+                  KALDI_WARN << "Invalid line in segments file [bad channel]: " << line;
+                  continue;
+              }
       }
       /* check whether a segment start time and end time exists in recording 
        * if fails , skips the segment.
@@ -170,23 +178,19 @@ int main(int argc, char *argv[]) {
        * if yes, specify the channel info in segments file
        * otherwise skips the segment
        */
-      if (channel == -1) {
-        if (num_chan == 1) channel = 0;
-        else {
-          KALDI_ERR << "If your data has multiple channels, you must specify the"
-              " channel in the segments file.  Processing segment " << segment;
-        }
-      } else {
-        if (channel >= num_chan) {
-          KALDI_WARN << "Invalid channel " << channel << " >= " << num_chan
-                     << ", processing segment " << segment;
+      if ( end_chan == -1) end_chan = num_chan-1;
+
+      if ( start_chan == -1) start_chan  = 0;
+
+      if ( start_chan >= num_chan || end_chan >= num_chan || start_chan >= end_chan) {
+          KALDI_WARN << "Invalid channel section [" << start_chan << " - " << end_chan
+                     << "] vs num_chan = " << num_chan << ", processing segment " << segment;
           continue;
-        }
       }
       /*
        * This function  return a portion of a wav data from the orignial wav data matrix 
        */
-      SubMatrix<BaseFloat> segment_matrix(wave_data, channel, 1, start_samp, end_samp-start_samp);
+      SubMatrix<BaseFloat> segment_matrix(wave_data, start_chan, end_chan-start_chan, start_samp, end_samp-start_samp);
       WaveData segment_wave(samp_freq, segment_matrix);
       writer.Write(segment, segment_wave); // write segment in wave format.
       num_success++;
