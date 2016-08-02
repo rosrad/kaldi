@@ -35,7 +35,6 @@ int main(int argc, char *argv[]) {
 
         ParseOptions po(usage);
         PhatGCCOptions opts;
-        std::string output_format = "kaldi";
         opts.Register(&po);
 
         po.Read(argc, argv);
@@ -53,10 +52,7 @@ int main(int argc, char *argv[]) {
         if (!kaldi_writer.Open(output_wspecifier)) {
             KALDI_ERR << "Could not initialize output with wspecifier "
                       << output_wspecifier;
-        }  else {
-            KALDI_ERR << "Invalid output_format string " << output_format;
-        }
-
+        }  
         PhatGCC gcc(opts);
         int32 num_utts = 0, num_success = 0;
         for (; !reader.Done(); reader.Next()) {

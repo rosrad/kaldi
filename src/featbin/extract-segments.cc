@@ -190,7 +190,7 @@ int main(int argc, char *argv[]) {
       /*
        * This function  return a portion of a wav data from the orignial wav data matrix 
        */
-      SubMatrix<BaseFloat> segment_matrix(wave_data, start_chan, end_chan-start_chan, start_samp, end_samp-start_samp);
+      SubMatrix<BaseFloat> segment_matrix(wave_data, start_chan, end_chan-start_chan+1, start_samp, end_samp-start_samp);
       WaveData segment_wave(samp_freq, segment_matrix);
       writer.Write(segment, segment_wave); // write segment in wave format.
       num_success++;
