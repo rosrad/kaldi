@@ -71,6 +71,12 @@ GSYMS
 /egs/*/s*/exp
 /egs/*/s*/data
 
+/egs/*/mfcc
+/egs/*/plp
+/egs/*/exp
+/egs/*/data
+
+
 # /tools/
 /tools/BeamformIt/
 /tools/libsndfile*
