@@ -104,7 +104,7 @@ void PhatGCC::Compute(const MatrixBase<BaseFloat>&  wav,
 
             spec_XXt(x.Row(id0),x.Row(id1),P);
             norm_X(P);
-            feature.Row(i).Range(k, wlen).CopyFromVec(P);
+            feature.Row(i).Range(k*wlen, wlen).CopyFromVec(P);
         }
     }
 }
