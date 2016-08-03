@@ -6,7 +6,7 @@
 # see ../run.sh for example
 
 # Begin configuration section.
-nj=1
+nj=8
 cmd=run.pl
 gcc_config=conf/gcc.conf
 # End configuration section.
@@ -105,7 +105,7 @@ for n in $(seq $nj); do
     cat $gccdir/raw_gcc_$name.$n.scp || exit 1;
 done > $data/feats.scp
 
-rm $logdir/wav_${name}.*.scp  $logdir/segments.* 2>/dev/null
+# rm $logdir/wav_${name}.*.scp  $logdir/segments.* 2>/dev/null
 
 nf=`cat $data/feats.scp | wc -l`
 

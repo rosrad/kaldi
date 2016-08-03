@@ -34,7 +34,7 @@ for f in $files
 do
     name=$(basename $f);
     cat $f |awk -v r=${name%.*} '{print  r"_"$1, r, $1,$2} '
-done |tee $data_dir/segments |head -n $nlog
+done > $data_dir/segments 
 
 
 # for wav.scp
@@ -43,5 +43,5 @@ for f in $files
 do
     name=$(basename $f);
     echo "${name%.*} $pcm2wav ${f/%.txt/.pcm} - $nchan $fs $bits |"
-done |tee $data_dir/wav.scp |head -n $nlog
+done > $data_dir/wav.scp
 
