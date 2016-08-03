@@ -85,26 +85,31 @@ void PhatGCC::Compute(const MatrixBase<BaseFloat>&  wav,
     int32 nsample = wav.NumCols();
     int32 nchan = wav.NumRows();
     int32 npair = opts_.NumPair();
-    int32 nfrm = nsample/wlen;
+    int32 nshift = wlen/2;
+    int32 nfrm = (nsample-wlen)/nshift + 1;
     
     Matrix<BaseFloat> x;
-    Vector<BaseFloat> P(wlen);
-    feature.Resize(nfrm,wlen*npair);
+
+    int32 minbin=25;
+    int32 nbin = 200-25;
+    Vector<BaseFloat> P(nbin*2);
+    feature.Resize(nfrm,nbin*2*npair);
 
     for (int32 i = 0; i < nfrm; i++) {
-        x = wav.ColRange(i*wlen,wlen);
+        x = wav.ColRange(i*nshift,wlen);
         x.MulColsVec(win_);  // x = x.*w
         for (int32 j = 0; j < nchan; j++) {
             srfft_->Compute(x.RowData(j), true);
         }
-
+        
         for (int32 k = 0; k < pairs_.size(); k++ ) {
             int32 id0 = pairs_[k].first;
             int32 id1 = pairs_[k].second;
 
-            spec_XXt(x.Row(id0),x.Row(id1),P);
+            spec_XXt(x.Row(id0).Range(minbin*2, nbin*2),
+                     x.Row(id1).Range(minbin*2, nbin*2), P);
             norm_X(P);
-            feature.Row(i).Range(k*wlen, wlen).CopyFromVec(P);
+            feature.Row(i).Range(k*nbin*2, nbin*2).CopyFromVec(P);
         }
     }
 }
