@@ -48,8 +48,8 @@ int main(int argc, char *argv[]) {
             exit(1);
         }
         
-        KALDI_ASSERT((ClassifyRspecifier(po.GetArg(1), NULL, NULL) == kNoRspecifier)
-                     && "feature file should be tables, e.g. archives");
+        // KALDI_ASSERT((ClassifyRspecifier(po.GetArg(1), NULL, NULL) == kNoRspecifier)
+        //              && "feature file should be tables, e.g. archives");
 
         string feat_rspecifier = po.GetArg(1);
         string label_rspecifier = po.GetArg(2);
@@ -71,7 +71,6 @@ int main(int argc, char *argv[]) {
                 break;
             }
 
-            label_reader.Value(utt);
             const Matrix<BaseFloat> &mat = feats_reader.Value();
             int32 num_frames = mat.NumRows();
 
