@@ -5,11 +5,13 @@ fs=16000;
 bits=16;
 pcm2wav=${KALDI_ROOT}/tools/pcm2wav/pcm2wav
 nlog=2
+doa=
 . parse_options.sh || exit 1;
 
 if [ $# -ne 2 ]; then
     echo "USAGE: %0 [opts] <corpus_root> <data_dir>"
     echo "Options: "
+    echo "  --doa           #specify doa degree"
     echo "  --nchan         #number of channels "
     echo "  --fs            #signal sample rate"
     echo "  --bits          #bits per sample"
@@ -29,13 +31,27 @@ data_dir=$2
 files=$(find $corpus_root -type f  -iname  "*.txt"|sort)
 [ ! -d  $data_dir ] & mkdir -p $data_dir
 
-echo  $data_dir/segments
+
 for f in $files
 do
     name=$(basename $f);
-    cat $f |awk -v r=${name%.*} '{print  r"_"$1, r, $1,$2} '
-done > $data_dir/segments 
+    if [ -z $doa ] ; then
+        d=$(basename $(dirname $f) |perl -ane 's/\D//;print;')
+    else
+        d=$doa
+    fi
+    cat $f |awk -v r=${name%.*} -v d=$d '{print  r"_"$1, r, $1,$2,d}'
+done> $data_dir/tmp.scp
 
+echo  $data_dir/segments
+cat $data_dir/tmp.scp | awk '{print $1,$2,$3,$4}' > $data_dir/segments
+# head   $data_dir/segments
+
+echo  $data_dir/doa.ark
+cat $data_dir/tmp.scp | awk '{print $1,$5}' > $data_dir/doa.ark
+# head $data_dir/doa.ark
+
+rm $data_dir/tmp.scp
 
 # for wav.scp
 echo  $data_dir/wav.scp
@@ -43,5 +59,6 @@ for f in $files
 do
     name=$(basename $f);
     echo "${name%.*} $pcm2wav ${f/%.txt/.pcm} - $nchan $fs $bits |"
-done > $data_dir/wav.scp
+done |sort -k1 > $data_dir/wav.scp
 
+# for doa.scp
