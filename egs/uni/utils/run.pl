@@ -198,7 +198,7 @@ for ($jobid = $jobstart; $jobid <= $jobend; $jobid++) {
 
     # Pipe into bash.. make sure we're not using any other shell.
     open(B, "|bash") || die "run.pl: Error opening shell command";
-    print B "( " . $cmd . ") 2>>$logfile >> $logfile";
+    print B "( " . $cmd . ") |& tee -a $logfile";
     close(B);                   # If there was an error, exit status is in $?
     $ret = $?;
 
