@@ -47,9 +47,13 @@ echo  $data_dir/segments
 cat $data_dir/tmp.scp | awk '{print $1,$2,$3,$4}' > $data_dir/segments
 # head   $data_dir/segments
 
-echo  $data_dir/doa.ark
-cat $data_dir/tmp.scp | awk '{print $1,$5}' > $data_dir/doa.ark
-# head $data_dir/doa.ark
+echo  $data_dir/utt2doa
+cat $data_dir/tmp.scp | awk '{print $1,$5}' > $data_dir/utt2doa
+
+# make fake utt2spk from doa.scp
+cp $data_dir/utt2doa $data_dir/utt2spk
+utils/utt2spk_to_spk2utt.pl $data_dir/utt2spk > $data_dir/spk2utt 
+# head $data_dir/utt2doa
 
 rm $data_dir/tmp.scp
 
@@ -61,4 +65,3 @@ do
     echo "${name%.*} $pcm2wav ${f/%.txt/.pcm} - $nchan $fs $bits |"
 done |sort -k1 > $data_dir/wav.scp
 
-# for doa.scp
