@@ -10,7 +10,7 @@ nj=8
 cmd=run.pl
 gcc_config=conf/gcc.conf
 # End configuration section.
-
+set -e
 echo "$0 $@"  # Print the command line for logging
 
 if [ -f path.sh ]; then . ./path.sh; fi
@@ -54,9 +54,12 @@ if [ -f $data/feats.scp ]; then
     mv $data/feats.scp $data/.backup
 fi
 
+num_spk=$(wc -l $data/spk2utt|awk '{print $1}')
+nj=$(( num_spk > nj ? nj : num_spk))
+
 scp=$data/wav.scp
 
-required="$scp $gcc_config"
+required="$scp $gcc_config $data/spk2utt"
 
 for f in $required; do
     if [ ! -f $f ]; then
@@ -65,6 +68,8 @@ for f in $required; do
     fi
 done
 # utils/validate_data_dir.sh --no-text --no-feats $data || exit 1;
+num_spk=$(wc -l $data/spk2utt|awk '{print $1}')
+nj=$(( num_spk > nj ? nj : num_spk))
 
 for n in $(seq $nj); do
     # the next command does nothing unless $gccdir/storage/ exists, see
@@ -72,26 +77,37 @@ for n in $(seq $nj); do
     utils/create_data_link.pl $gccdir/raw_gcc_$name.$n.ark
 done
 
+if [ -f $data/segments ]; then
+    echo "$0 [info]: segments file exists: using that."
 
-if [ ! -f $data/segments ]; then
-    echo "$0 [error]: no segments file for extraction"
-    exit 1
+    split_segments=""
+    for n in $(seq $nj); do
+        split_segments="$split_segments $logdir/segments.$n"
+    done
+
+    utils/split_scp.pl $data/segments $split_segments || exit 1;
+    # rm $logdir/.error 2>/dev/null
+
+    $cmd JOB=1:$nj $logdir/make_gcc_${name}.JOB.log \
+        extract-segments scp,p:$scp $logdir/segments.JOB ark:- \| \
+        compute-gcc --config=$gcc_config ark:- \
+        ark,scp:$gccdir/raw_gcc_$name.JOB.ark,$gccdir/raw_gcc_$name.JOB.scp \
+        || exit 1;
+else
+    echo "$0 [info]: No segments file exist: using wav.scp"
+
+    split_scps=""
+    for n in $(seq $nj); do
+        split_scps="$split_scps $logdir/wav.$n.scp"
+    done
+
+    utils/split_scp.pl $scp $split_scps || exit 1;
+
+    $cmd JOB=1:$nj $logdir/make_gcc_${name}.JOB.log \
+        compute-gcc --config=$gcc_config scp,p:$logdir/wav.JOB.scp \
+        ark,scp:$gccdir/raw_gcc_$name.JOB.ark,$gccdir/raw_gcc_$name.JOB.scp \
+        || exit 1;
 fi
-echo "$0 [info]: segments file exists: using that."
-
-split_segments=""
-for n in $(seq $nj); do
-    split_segments="$split_segments $logdir/segments.$n"
-done
-
-utils/split_scp.pl $data/segments $split_segments || exit 1;
-rm $logdir/.error 2>/dev/null
-
-$cmd JOB=1:$nj $logdir/make_gcc_${name}.JOB.log \
-    extract-segments scp,p:$scp $logdir/segments.JOB ark:- \| \
-    compute-gcc --config=$gcc_config ark:- \
-    ark,scp:$gccdir/raw_gcc_$name.JOB.ark,$gccdir/raw_gcc_$name.JOB.scp \
-    || exit 1;
 
 
 if [ -f $logdir/.error.$name ]; then

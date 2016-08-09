@@ -18,6 +18,8 @@ srcdir=$1
 trndir=$2
 cvdir=$3
 
+[ ! -d $trndir ] && mkdir -p $trndir
+[ ! -d $cvdir ] && mkdir -p $cvdir
 #total number of lines
 N=$(cat $srcdir/utt2spk | wc -l)
 #get line number where (100-P)% of the data lies

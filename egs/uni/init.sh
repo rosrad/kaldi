@@ -19,11 +19,12 @@ set -e
 set -u
 set -o pipefail
 
-set=unisound/20151010
-corpus_dir=/home/renbo/work/corpus/${set}
-data=data/${set}
+set=doa_360_degree_data_no_reverb
+corpus_dir=/home/renbo/work/corpus/uni_doa/simu/$set
+data=data/${set}/total
 
-# ./local/data_prepare.sh --nchan 4 --fs 16000 $corpus_dir $data
-# ./steps/make_gcc.sh --nj 16 $data
-# ./local/randsub_tr_cv.sh $data ${data}_tr90 ${data}_cv10
-./local/train_doa.sh $data exp/doa/${set}
+./local/uni_simu_data_prepare.sh $corpus_dir $data
+./steps/make_gcc.sh --nj 16 $data
+./local/randsub_tr_cv.sh $data ${data}_train ${data}_eval
+./local/train_doa.sh ${data}_train exp/doa/${set}
+./local/decode_doa.sh exp/doa/$set ${data}_eval

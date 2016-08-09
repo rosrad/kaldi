@@ -6,6 +6,8 @@ bits=16;
 pcm2wav=${KALDI_ROOT}/tools/pcm2wav/pcm2wav
 nlog=2
 doa=
+key='大白大白'
+mk_gcc="yes"
 . parse_options.sh || exit 1;
 
 if [ $# -ne 2 ]; then
@@ -34,21 +36,24 @@ files=$(find $corpus_root -type f  -iname  "*.txt"|sort)
 
 for f in $files
 do
+
     name=$(basename $f);
     if [ -z $doa ] ; then
-        d=$(basename $(dirname $f) |perl -ane 's/\D//;print;')
+        d=$(basename $(dirname $f) |perl -ane 'm/(\d+)/;print $1;')
     else
         d=$doa
     fi
-    cat $f |awk -v r=${name%.*} -v d=$d '{print  r"_"$1, r, $1,$2,d}'
-done> $data_dir/tmp.scp
+    doa=$(( doa/5))
+    cat $f|grep $key |awk -v r=${name%.*} -v d=$d '{print  r"_"$1, r, $1,$2,d}'
+done > $data_dir/tmp.scp
 
 echo  $data_dir/segments
 cat $data_dir/tmp.scp | awk '{print $1,$2,$3,$4}' > $data_dir/segments
-# head   $data_dir/segments
+head   $data_dir/segments -n3
 
 echo  $data_dir/utt2doa
 cat $data_dir/tmp.scp | awk '{print $1,$5}' > $data_dir/utt2doa
+head -n 3  $data_dir/utt2doa
 
 # make fake utt2spk from doa.scp
 cp $data_dir/utt2doa $data_dir/utt2spk
@@ -64,4 +69,6 @@ do
     name=$(basename $f);
     echo "${name%.*} $pcm2wav ${f/%.txt/.pcm} - $nchan $fs $bits |"
 done |sort -k1 > $data_dir/wav.scp
+head -n3 $data_dir/wav.scp
 
+[ $mk_gcc == "yes" ] && ./steps/make_gcc.sh --nj 16 $data_dir
