@@ -7,7 +7,7 @@ pcm2wav=${KALDI_ROOT}/tools/pcm2wav/pcm2wav
 nlog=2
 doa=
 key='大白大白'
-mk_gcc="no"
+mk_gcc="yes"
 . parse_options.sh || exit 1;
 
 if [ $# -ne 2 ]; then

@@ -19,12 +19,13 @@ set -e
 set -u
 set -o pipefail
 
-set=no_reverb
+set=${1:-"no_reverb"}
+tag=${2:-"entire350"}
 corpus_dir=/home/renbo/work/corpus/uni_doa/simu/$set
-data=data/${set}/entire350
+data=data/${set}/${tag}
 
 ./local/uni_simu_data_prepare.sh $corpus_dir $data
-./steps/make_gcc.sh --nj 16 $data
+[ ! -f $data/feats.scp ] && ./steps/make_gcc.sh --nj 16 $data
 ./local/randsub_tr_cv.sh $data ${data}_train ${data}_eval
-./local/train_doa.sh ${data}_train exp/doa/${set}
-./local/decode_doa.sh exp/doa/$set ${data}_eval
+./local/train_doa.sh ${data}_train exp/doa/${set}_${tag}
+./local/decode_doa.sh exp/doa/${set}_${tag} ${data}_eval

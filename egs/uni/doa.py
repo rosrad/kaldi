@@ -7,10 +7,13 @@ import sys
 narg=len(sys.argv);
 if narg < 2:
     print "No enough parameters"
-    print "doa.py nnet_dir"
+    print "doa.py nnet_dir [data/350]"
     sys.exit()
 
 nnet = sys.argv[1];
+data_dir = "data"
+if narg>=3:
+    data_dir = sys.argv[2]
 
 # set="no_reverb"
 # nnet=path.join("exp/doa/", set)
@@ -22,10 +25,12 @@ sets.append(["recording/20160623_4chans", "你好魔方"])
 sets.append(["recording/20160517_after_aec", "你好魔方"])  # 
 
 def oneset(s):
-    data=path.join("data",s[0])
+    data=path.join(data_dir,s[0])
     if not  path.isfile(path.join(data, 'feats.scp')):
+        opts="--mk-gcc yes"
         cmd=" ".join(["./local/data_prepare.sh",
-                  "--key", s[1], path.join(corpus, s[0]), data])
+                      opts, "--key", s[1],
+                      path.join(corpus, s[0]), data])
         # print cmd
         utils.runbash(cmd)
     
