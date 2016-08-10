@@ -108,7 +108,8 @@ def read_vec_int(file_or_fd):
       ans[i] = struct.unpack('<i', fd.read(4))[0] #data
     return ans
   else: # ascii,
-    arr = (binary + fd.readline()).strip().split()
+    fd.seek(-2,1)
+    arr = fd.readline().strip().split()
     try:
       arr.remove('['); arr.remove(']') # optionally
     except ValueError:

@@ -2,15 +2,24 @@
 # -*- coding: utf-8 -*-  
 import os.path as path
 import utils
+import sys
 
-set="doa_360_degree_data_no_reverb"
-nnet=path.join("exp/doa/", set)
+narg=len(sys.argv);
+if narg < 2:
+    print "No enough parameters"
+    print "doa.py nnet_dir"
+    sys.exit()
+
+nnet = sys.argv[1];
+
+# set="no_reverb"
+# nnet=path.join("exp/doa/", set)
 
 corpus="/home/renbo/work/corpus/uni_doa/"
 sets=[]
 sets.append(["recording/20151010", "大白大白"])
 sets.append(["recording/20160623_4chans", "你好魔方"])
-# sets.append(["recording/20160517_after_aec", "你好魔方"])
+sets.append(["recording/20160517_after_aec", "你好魔方"])  # 
 
 def oneset(s):
     data=path.join("data",s[0])

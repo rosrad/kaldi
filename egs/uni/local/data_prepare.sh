@@ -7,7 +7,7 @@ pcm2wav=${KALDI_ROOT}/tools/pcm2wav/pcm2wav
 nlog=2
 doa=
 key='大白大白'
-mk_gcc="yes"
+mk_gcc="no"
 . parse_options.sh || exit 1;
 
 if [ $# -ne 2 ]; then
@@ -43,7 +43,7 @@ do
     else
         d=$doa
     fi
-    doa=$(( doa/5))
+    d=$(( d/5 ))
     cat $f|grep $key |awk -v r=${name%.*} -v d=$d '{print  r"_"$1, r, $1,$2,d}'
 done > $data_dir/tmp.scp
 

@@ -18,6 +18,7 @@ ref = sys.argv[2];
 # ref='/home/renbo/work/uni/data/unisound/20151010/utt2doa'
 # reg='/home/renbo/work/uni/exp/doa/unisound/20151010/decode_data_unisound_20151010_cv10_/decode.result'
 # offset=30
+offset=offset/5;
 reg_dict={k:v for k,v in kaldi_io.read_vec_int_ark(reg)}
 keys=reg_dict.keys()
 

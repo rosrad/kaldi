@@ -38,7 +38,7 @@ wc $data_dir/wav.scp
 
 echo "for $data_dir/utt2doa"
 cat $data_dir/wav.scp \
-    | perl -ane 'my @array = split(/ /); $array[0] =~ m/degree_(\d+)/; $n=int($array[0]/5); print "$n \t $1\n";' \
+    | perl -ane 'my @array = split(/ /); $array[0] =~ m/degree_(\d+)/; $n=int($1/5); print "$array[0] \t $n\n";' \
     > $data_dir/utt2doa
 wc $data_dir/utt2doa
 
