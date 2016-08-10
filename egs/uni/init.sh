@@ -21,10 +21,10 @@ set -o pipefail
 
 set=no_reverb
 corpus_dir=/home/renbo/work/corpus/uni_doa/simu/$set
-data=data/${set}/whole
+data=data/${set}/entire350
 
 ./local/uni_simu_data_prepare.sh $corpus_dir $data
-# ./steps/make_gcc.sh --nj 16 $data
+./steps/make_gcc.sh --nj 16 $data
 ./local/randsub_tr_cv.sh $data ${data}_train ${data}_eval
 ./local/train_doa.sh ${data}_train exp/doa/${set}
 ./local/decode_doa.sh exp/doa/$set ${data}_eval

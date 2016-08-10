@@ -93,7 +93,7 @@ void PhatGCC::Compute(const MatrixBase<BaseFloat>&  wav,
     int32 minbin=25;
     int32 nbin = 200-25;
     Vector<BaseFloat> P(nbin*2);
-    feature.Resize(nfrm,nbin*2*npair);
+    feature.Resize(nfrm,nbin*2);
 
     for (int32 i = 0; i < nfrm; i++) {
         x = wav.ColRange(i*nshift,wlen);
@@ -109,7 +109,7 @@ void PhatGCC::Compute(const MatrixBase<BaseFloat>&  wav,
             spec_XXt(x.Row(id0).Range(minbin*2, nbin*2),
                      x.Row(id1).Range(minbin*2, nbin*2), P);
             norm_X(P);
-            feature.Row(i).Range(k*nbin*2, nbin*2).CopyFromVec(P);
+            feature.Row(i).AddVec(1,P);
         }
     }
 }
