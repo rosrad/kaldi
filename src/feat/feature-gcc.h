@@ -1,4 +1,4 @@
-// feat/feature-fbank.h
+// feat/feature-gcc.h
 
 // Copyright 2009-2012  Karel Vesely
 //                2016  Johns Hopkins University (author: Daniel Povey)
@@ -18,44 +18,23 @@
 // See the Apache 2 License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef KALDI_FEAT_FEATURE_FBANK_H_
-#define KALDI_FEAT_FEATURE_FBANK_H_
+#ifndef KALDI_FEAT_FEATURE_GCC_H_
+#define KALDI_FEAT_FEATURE_GCC_H_
 
-#include<map>
+#include <map>
 #include <string>
+#include <memory>
 
+#include "feat/mic.h"
 #include "feat/feature-common.h"
 #include "feat/feature-functions.h"
 #include "feat/feature-window.h"
 
 
-
-
-
-
-
 namespace kaldi {
-    /// @addtogroup  feat FeatureExtraction
-    /// @{
-    /// Class for computing mel-filterbank features; see \ref feat_mfcc for more
-    /// information.
-
-
-    struct PhatGCCOptions {
-
-        int32 wlen;
-        int32 nmic;
-        PhatGCCOptions(): wlen(512), nmic(4){}
-        int32 NumPair() { return nmic*(nmic-1)/2;}
-        void Register(OptionsItf *opts) {
-            opts->Register("wlen", &wlen, "window size for each fram");
-            opts->Register("nmic", &nmic, "number of microphone elements");
-        }
-    };
-
     class PhatGCC {
   public:
-        explicit PhatGCC(const PhatGCCOptions& opts);
+        PhatGCC(Mic& mic);
         PhatGCC(const PhatGCC &other);
         /**
            Function that computes one frame of features from
@@ -68,15 +47,17 @@ namespace kaldi {
            the computed feature will be written.
         */
         void Compute(const MatrixBase<BaseFloat>& wav, Matrix<BaseFloat>&  feature);
-        int32 Dim() { return opts_.NumPair() * opts_.wlen/2; }
+        int32 Dim() { return mic_.Pairs().size() * mic_.ntheta; }
         ~PhatGCC();
 
   private:
-        PhatGCCOptions opts_;
-        typedef std::vector<std::pair<int32,int32> > PairVec;
-        PairVec pairs_;
-        Vector<BaseFloat> win_;
         SplitRadixRealFft<BaseFloat>* srfft_;
+        Mic& mic_;
+        int32 wlen_;
+        /* typedef std::vector<std::pair<int32,int32> > PairVec; */
+        /* PairVec pairs_; */
+        Vector<BaseFloat> win_;
+
         PhatGCC &operator =(const PhatGCC &other);
     };
 
@@ -86,4 +67,4 @@ namespace kaldi {
 }  // namespace kaldi
 
 
-#endif  // KALDI_FEAT_FEATURE_FBANK_H_
+#endif  // KALDI_FEAT_FEATURE_GCC_H_
