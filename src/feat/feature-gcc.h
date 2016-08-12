@@ -53,9 +53,6 @@ namespace kaldi {
   private:
         SplitRadixRealFft<BaseFloat>* srfft_;
         Mic& mic_;
-        int32 wlen_;
-        /* typedef std::vector<std::pair<int32,int32> > PairVec; */
-        /* PairVec pairs_; */
         Vector<BaseFloat> win_;
 
         PhatGCC &operator =(const PhatGCC &other);

@@ -11,6 +11,7 @@ Mic::Mic(std::vector<Pos> pos, int32 wlen, int32 fs)
     c_ = 340;
     pos_ = pos;
     ntheta = 360/res_;
+    Init();
 }
 
 PairVec& Mic::Pairs() {
@@ -56,7 +57,7 @@ void Mic::Init(){
 
 
 
-    Matrix<BaseFloat> exp_i(ntheta, nbin);
+    Matrix<BaseFloat> exp_i(ntheta, nbin*2);
 
     Vector<BaseFloat> alpha_i(ntheta);
     for( int32 i=0; i < npair; i++) {
@@ -72,8 +73,15 @@ void Mic::Init(){
         exp_i.SetZero();
         for (int32 j=0; j< ntheta; j++) {
             tau = dmic * cos( (theta_grid(j)-mic_theta)*M_PI/180 ) / c_;
-            exp_i.Row(j).CopyFromVec(f_grid);
-            exp_i.Row(j).Scale(tau*2*M_PI);
+
+            for( int32 k=0; k < nbin; k++)
+            {
+                BaseFloat x = - fs/wlen*(k+1)*tau*2*M_PI;
+                exp_i(j,2*k) = cosf(x);
+                exp_i(j,2*k+1) = sinf(x);
+            }
+            // exp_i.Row(j).CopyFromVec(f_grid);
+            // exp_i.Row(j).Scale(tau*2*M_PI);
         }
         exp_.push_back(exp_i);
     }

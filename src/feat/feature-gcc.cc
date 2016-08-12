@@ -26,12 +26,12 @@ namespace kaldi {
 PhatGCC::PhatGCC(Mic& mic):
         srfft_(NULL) , mic_(mic){
     // compute window 
-    int32 wlen_ = mic_.wlen;
-    win_.Resize(wlen_);
-	for(int i=0; i<wlen_; i++)
-		win_(i) = sin((0.5+i)/wlen_*M_PI);
+    int32 wlen = mic_.wlen;
+    win_.Resize(wlen);
+	for(int i=0; i<wlen; i++)
+		win_(i) = sin((0.5+i)/wlen*M_PI);
     
-    srfft_ = new SplitRadixRealFft<BaseFloat>(wlen_);
+    srfft_ = new SplitRadixRealFft<BaseFloat>(wlen);
 }
 
 PhatGCC::PhatGCC(const PhatGCC &other):
@@ -39,7 +39,7 @@ PhatGCC::PhatGCC(const PhatGCC &other):
     if (other.srfft_)
         srfft_ = new SplitRadixRealFft<BaseFloat>(*(other.srfft_));
     else
-        srfft_ = new SplitRadixRealFft<BaseFloat>(other.wlen_);
+        srfft_ = new SplitRadixRealFft<BaseFloat>(other.mic_.wlen);
     win_ = other.win_;
     // for(int i = 0; i < opts_.NumPair(); i++) {
     //     pairs_[i] = other.pairs_[i];
@@ -75,12 +75,16 @@ void norm_X(Vector<BaseFloat>& x)
 }
 
 // special purpose for  real( mag .* x);
-void Exp_XX_sum(VectorBase<BaseFloat>& e, const VectorBase<BaseFloat>& x)
+void XX_real(const VectorBase<BaseFloat>& e, const VectorBase<BaseFloat>& x,
+             VectorBase<BaseFloat>& d)
 {
     // e.dim * 2  == x.dim
-	for(int32 i=0; i<e.Dim(); i++)
+    KALDI_ASSERT(e.Dim() == x.Dim() && e.Dim() == 2* d.Dim());
+    int32 j;
+	for(int32 i=0; i<d.Dim(); i++)
 	{  // real*real - imag*imag
-        e(i) = cos(e(i))*x(2*i) - sin(e(i))*x(2*i+1);
+        j = 2*i;
+        d(i) = e(j)*x(j) - e(j+1)*x(j+1);
 	}
 }
 
@@ -88,10 +92,11 @@ void Exp_XX_sum(VectorBase<BaseFloat>& e, const VectorBase<BaseFloat>& x)
 void PhatGCC::Compute(const MatrixBase<BaseFloat>&  wav,
                       Matrix<BaseFloat>& feature) {
     // extract window
+    int32 wlen= mic_.wlen;
     int32 nsample = wav.NumCols();
     int32 nchan = wav.NumRows();
-    int32 nshift = wlen_/2;
-    int32 nfrm = (nsample-wlen_)/nshift + 1;
+    int32 nshift = wlen/2;
+    int32 nfrm = (nsample-wlen)/nshift + 1;
     int32 ntheta = mic_.ntheta;
     PairVec& pairs = mic_.Pairs();
     int32 npair = pairs.size();
@@ -101,11 +106,12 @@ void PhatGCC::Compute(const MatrixBase<BaseFloat>&  wav,
     int32 minbin=25;
     int32 nbin = 200-25;
     Vector<BaseFloat> P(nbin*2);
-    Vector<BaseFloat> F(nbin);
-    feature.Resize(nfrm,ntheta*npair);
+    Vector<BaseFloat> F(ntheta);
+    Matrix<BaseFloat> real_cc(ntheta, nbin);
+    feature.Resize(ntheta,nbin*npair);
     
     for (int32 i = 0; i < nfrm; i++) {
-        x = wav.ColRange(i*nshift,wlen_);
+        x = wav.ColRange(i*nshift,wlen);
         x.MulColsVec(win_);  // x = x.*w
         for (int32 j = 0; j < nchan; j++) {
             srfft_->Compute(x.RowData(j), true);
@@ -116,17 +122,17 @@ void PhatGCC::Compute(const MatrixBase<BaseFloat>&  wav,
             int32 id0 = pairs[k].first;
             int32 id1 = pairs[k].second;
             
-            Matrix<BaseFloat> exp(mic_.Exp(k).ColRange(minbin,nbin));
-
+            Matrix<BaseFloat> exp(mic_.Exp(k).ColRange(minbin*2,nbin*2));
+            
             spec_XXt(x.Row(id0).Range(minbin*2, nbin*2),
                      x.Row(id1).Range(minbin*2, nbin*2), P);
             norm_X(P);
+
             for (int32 r=0; r < exp.NumRows(); r++) {
-                SubVector<BaseFloat> row(exp, r);
-                Exp_XX_sum(row, P);
+                SubVector<BaseFloat> row(real_cc, r);
+                XX_real(exp.Row(r), P, row);
             }
-            F.AddColSumMat(1, exp);
-            feature.Row(i).Range(k*ntheta, ntheta).CopyFromVec(F);            
+            feature.ColRange(k*nbin, nbin).AddMat(1, real_cc);            
         }
     }
 }

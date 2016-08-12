@@ -20,7 +20,7 @@
 
 #include "base/kaldi-common.h"
 #include "util/common-utils.h"
-// #include "feat/mic.h"
+#include "feat/mic.h"
 #include "feat/feature-gcc.h"
 #include "feat/wave-reader.h"
 
@@ -54,10 +54,11 @@ int main(int argc, char *argv[]) {
 
         // array = [1,0;0,1;-1,0;0,-1]*d.';
         std::vector<Pos> mic_pos;
-        mic_pos.push_back(Pos(1,0));
-        mic_pos.push_back(Pos(0,1));
-        mic_pos.push_back(Pos(-1,0));
-        mic_pos.push_back(Pos(0,-1));
+        BaseFloat r=0.035;
+        mic_pos.push_back(Pos(r,0));
+        mic_pos.push_back(Pos(0,r));
+        mic_pos.push_back(Pos(-r,0));
+        mic_pos.push_back(Pos(0,-r));
         Mic mic(mic_pos, 512, 16000);
         PhatGCC gcc(mic);
         int32 num_utts = 0, num_success = 0;

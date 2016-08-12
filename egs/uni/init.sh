@@ -22,7 +22,7 @@ set -o pipefail
 set=${1:-"no_reverb"}
 tag=${2:-"entire350"}
 corpus_dir=/home/renbo/work/corpus/uni_doa/simu/$set
-data=data/${set}/${tag}
+data=data/simu/${set}/${tag}
 
 ./local/uni_simu_data_prepare.sh $corpus_dir $data
 [ ! -f $data/feats.scp ] && ./steps/make_gcc.sh --nj 16 $data
