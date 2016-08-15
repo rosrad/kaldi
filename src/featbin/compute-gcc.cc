@@ -35,6 +35,11 @@ int main(int argc, char *argv[]) {
 
 
         ParseOptions po(usage);
+        int32 wlen = 32;
+        int32 fs = 16000;
+        po.Register("wlen", &wlen, "window length");
+        po.Register("fs", &fs, "sampling frequency");
+
         po.Read(argc, argv);
 
         if (po.NumArgs() != 2) {
@@ -59,7 +64,7 @@ int main(int argc, char *argv[]) {
         mic_pos.push_back(Pos(0,r));
         mic_pos.push_back(Pos(-r,0));
         mic_pos.push_back(Pos(0,-r));
-        Mic mic(mic_pos, 512, 16000);
+        Mic mic(mic_pos, wlen, fs);
         PhatGCC gcc(mic);
         int32 num_utts = 0, num_success = 0;
         for (; !reader.Done(); reader.Next()) {
