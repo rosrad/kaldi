@@ -1,0 +1,224 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Color conversion demo</title>
+  <style>
+    #controls {
+        line-height: 40px;
+    }
+    #color_preview {
+        display: inline-block;
+        width: 100px;
+        height: 30px;
+        background-color: #000;
+    }
+  </style>
+</head>
+<body>
+  <h1>Color conversion demo</h1>
+
+  <div id="controls">
+    <label for="input_hex">RGB Hex:</label>
+    <input id="input_hex" type="text">
+    HTML notation, without '#'
+    <br>
+
+    <label for="input_r">Red:</label>
+    <input id="input_r" type="text">
+    <label for="input_g">Green:</label>
+    <input id="input_g" type="text">
+    <label for="input_b">Blue:</label>
+    <input id="input_b" type="text">
+    r, g, b = [0, 255]
+    <br>
+
+    <label for="input_h">Hue:</label>
+    <input id="input_h" type="text">
+    <label for="input_s">Saturation:</label>
+    <input id="input_s" type="text">
+    <label for="input_v">Value:</label>
+    <input id="input_v" type="text">
+    h = [0, 360], s = [0, 100], v = [0, 100]
+    <br>
+
+    <label for="input_hh">Hue:</label>
+    <input id="input_hh" type="text">
+    <label for="input_ss">Saturation:</label>
+    <input id="input_ss" type="text">
+    <label for="input_ll">Lightness:</label>
+    <input id="input_ll" type="text">
+    h = [0, 360], s = [0, 100], l = [0, 100]
+    <br>
+
+    <div>
+      <span>Color preview:</span>
+      <div id="color_preview"></div>
+    </div>
+  </div>
+
+  <script src="color_conversion.js"></script>
+  <script>
+    var input_hex, input_r, input_g, input_b,
+        input_h, input_s, input_v, preview,
+        convert_rgb, convert_hsv, convert_hsl, convert_hex;
+
+    input_hex = document.querySelector("#input_hex");
+    input_r = document.querySelector("#input_r");
+    input_g = document.querySelector("#input_g");
+    input_b = document.querySelector("#input_b");
+    input_h = document.querySelector("#input_h");
+    input_s = document.querySelector("#input_s");
+    input_v = document.querySelector("#input_v");
+    input_hh = document.querySelector("#input_hh");
+    input_ss = document.querySelector("#input_ss");
+    input_ll = document.querySelector("#input_ll");
+    preview = document.querySelector("#color_preview");
+
+    convert_rgb = function () {
+        var r, g, b, hsv, h, s, v, hsl, hh, ss, ll, hex;
+
+        // input
+        r = Clamp(0, 255, parseInt(input_r.value));
+        g = Clamp(0, 255, parseInt(input_g.value));
+        b = Clamp(0, 255, parseInt(input_b.value));
+
+        // convert
+        hsv = RGBToHSV(r / 255, g / 255, b / 255);
+
+        h = Math.round(hsv[0] * 360);  // [0, 360]
+        s = Math.round(hsv[1] * 100);  // [0, 100]
+        v = Math.round(hsv[2] * 100);  // [0, 100]
+
+        hsl = RGBToHSL(r / 255, g / 255, b / 255);
+
+        hh = Math.round(hsl[0] * 360);  // [0, 360]
+        ss = Math.round(hsl[1] * 100);  // [0, 100]
+        ll = Math.round(hsl[2] * 100);  // [0, 100]
+
+        hex = RGBToHex(r, g, b);
+
+        // output
+        input_h.value = h;
+        input_s.value = s;
+        input_v.value = v;
+        input_hh.value = hh;
+        input_ss.value = ss;
+        input_ll.value = ll;
+        input_hex.value = hex;
+        preview.style.backgroundColor = '#' + hex;
+    };
+
+    convert_hsv = function () {
+        var h, s, v, rgb, r, g, b, hsl, hh, ss, ll, hex;
+
+        // input
+        h = Clamp(0, 360, parseInt(input_h.value));
+        s = Clamp(0, 100, parseInt(input_s.value));
+        v = Clamp(0, 100, parseInt(input_v.value));
+
+        // convert
+        rgb = HSVToRGB(h / 360, s / 100, v / 100);
+
+        r = Math.round(rgb[0] * 255);  // [0, 255]
+        g = Math.round(rgb[1] * 255);  // [0, 255]
+        b = Math.round(rgb[2] * 255);  // [0, 255]
+
+        hsl = HSVToHSL(h / 360, s / 100, v / 100);
+
+        hh = Math.round(hsl[0] * 360);  // [0, 360]
+        ss = Math.round(hsl[1] * 100);  // [0, 100]
+        ll = Math.round(hsl[2] * 100);  // [0, 100]
+
+        hex = RGBToHex(r, g, b);
+
+        // output
+        input_r.value = r;
+        input_g.value = g;
+        input_b.value = b;
+        input_hh.value = hh;
+        input_ss.value = ss;
+        input_ll.value = ll;
+        input_hex.value = hex;
+        preview.style.backgroundColor = '#' + hex;
+    };
+
+    convert_hsl = function () {
+        var hh, ss, ll, rgb, r, g, b, hsv, h, s, v, hex;
+
+        // input
+        hh = Clamp(0, 360, parseInt(input_hh.value));
+        ss = Clamp(0, 100, parseInt(input_ss.value));
+        ll = Clamp(0, 100, parseInt(input_ll.value));
+
+        // convert
+        rgb = HSLToRGB(hh / 360, ss / 100, ll / 100);
+
+        r = Math.round(rgb[0] * 255);  // [0, 255]
+        g = Math.round(rgb[1] * 255);  // [0, 255]
+        b = Math.round(rgb[2] * 255);  // [0, 255]
+
+        hsv = HSLToHSV(hh / 360, ss / 100, ll / 100);
+
+        h = Math.round(hsv[0] * 360);  // [0, 360]
+        s = Math.round(hsv[1] * 100);  // [0, 100]
+        v = Math.round(hsv[2] * 100);  // [0, 100]
+
+        hex = RGBToHex(r, g, b);
+
+        // output
+        input_r.value = r;
+        input_g.value = g;
+        input_b.value = b;
+        input_h.value = h;
+        input_s.value = s;
+        input_v.value = v;
+        input_hex.value = hex;
+        preview.style.backgroundColor = '#' + hex;
+    };
+
+    convert_hex = function () {
+        var hex, rgb, r, g, b, hsv, h, s, v, hsl, hh, ss, ll;
+
+        // input
+        hex = input_hex.value.substring(0, 6);
+
+        // convert
+        rgb = HexToRGB(hex);
+
+        r = rgb[0];
+        g = rgb[1];
+        b = rgb[2];
+
+        hsv = RGBToHSV(r / 255, g / 255, b / 255);
+
+        h = Math.round(hsv[0] * 360);  // [0, 360]
+        s = Math.round(hsv[1] * 100);  // [0, 100]
+        v = Math.round(hsv[2] * 100);  // [0, 100]
+
+        hsl = RGBToHSL(r / 255, g / 255, b / 255);
+
+        hh = Math.round(hsl[0] * 360);  // [0, 360]
+        ss = Math.round(hsl[1] * 100);  // [0, 100]
+        ll = Math.round(hsl[2] * 100);  // [0, 100]
+
+        // output
+        input_r.value = r;
+        input_g.value = g;
+        input_b.value = b;
+        input_h.value = h;
+        input_s.value = s;
+        input_v.value = v;
+        input_hh.value = hh;
+        input_ss.value = ss;
+        input_ll.value = ll;
+        preview.style.backgroundColor = '#' + hex;
+    };
+
+    input_r.onchange = input_g.onchange = input_b.onchange = convert_rgb;
+    input_h.onchange = input_s.onchange = input_v.onchange = convert_hsv;
+    input_hh.onchange = input_ss.onchange = input_ll.onchange = convert_hsl;
+    input_hex.onchange = convert_hex;
+  </script>
+</body>
+</html>

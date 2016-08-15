@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>three.js demo</title>
+  <style type="text/css">
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    div#canvas-frame {
+      width: 640px;
+      height: 480px;
+    }
+  </style>
+</head>
+<body onload="start();">
+  <div id="canvas-frame"></div>
+  <script src="three.js"></script>
+  <script>
+    var renderer;
+    var width, height;
+    function initRenderer() {
+        var container = document.getElementById('canvas-frame');
+        width = container.clientWidth;
+        height = container.clientHeight;
+        renderer = new THREE.WebGLRenderer({
+            antialias : true
+        });
+        renderer.setSize(width, height);
+        renderer.setClearColor(0x123456, 1.0);
+        container.appendChild(renderer.domElement);
+    }
+
+    var camera;
+    function initCamera() {
+        camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
+        camera.position.x = 600;
+        camera.position.y = 0;
+        camera.position.z = 600;
+        camera.up.x = 0;
+        camera.up.y = 1;
+        camera.up.z = 0;
+        camera.lookAt({
+            x : 0,
+            y : 0,
+            z : 0
+        });
+    }
+
+    var scene;
+    function initScene() {
+        scene = new THREE.Scene();
+    }
+
+    var light;
+    function initLight() {
+        light = new THREE.AmbientLight(0xFF0000);
+        light.position.set(100, 100, 200);
+        scene.add(light);
+    }
+
+    var cube;
+    function initObject() {
+        var geometry = new THREE.BoxGeometry(200, 100, 50, 4, 4);
+        var material = new THREE.MeshLambertMaterial({
+            color:0x000000
+        });
+        cube = new THREE.Mesh(geometry, material);
+        cube.position = new THREE.Vector3(0, 0, 0);
+        cube.rotation.x = Math.PI * 0.1;
+        scene.add(cube);
+    }
+
+    function animate() {
+        cube.rotation.y += 0.01;
+        renderer.clear();
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+    }
+
+    function start() {
+        initRenderer();
+        initCamera();
+        initScene();
+        initLight();
+        initObject();
+        animate();
+    }
+  </script>
+</body>
+</html>

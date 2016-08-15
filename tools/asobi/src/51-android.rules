@@ -1,0 +1,77 @@
+# all known devices
+# copy this file to /etc/udev/rules.d/
+# -rw-r--r--. 1 root root 3.5K 2014-01-06 15:59 51-android.rules
+# Refer to: http://developer.android.com/tools/device.html
+
+#Acer
+SUBSYSTEM=="usb", ATTR{idVendor}=="0502", MODE="0666", OWNER="physacco", GROUP="physacco"
+#ASUS
+SUBSYSTEM=="usb", ATTR{idVendor}=="0b05", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Dell
+SUBSYSTEM=="usb", ATTR{idVendor}=="413c", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Foxconn
+SUBSYSTEM=="usb", ATTR{idVendor}=="0489", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Fujitsu
+SUBSYSTEM=="usb", ATTR{idVendor}=="04c5", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Fujitsu Toshiba
+SUBSYSTEM=="usb", ATTR{idVendor}=="04c5", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Garmin-Asus
+SUBSYSTEM=="usb", ATTR{idVendor}=="091e", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Google
+SUBSYSTEM=="usb", ATTR{idVendor}=="18d1", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Haier
+SUBSYSTEM=="usb", ATTR{idVendor}=="201E", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Hisense
+SUBSYSTEM=="usb", ATTR{idVendor}=="109b", MODE="0666", OWNER="physacco", GROUP="physacco"
+#HTC
+SUBSYSTEM=="usb", ATTR{idVendor}=="0bb4", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Huawei
+SUBSYSTEM=="usb", ATTR{idVendor}=="12d1", MODE="0666", OWNER="physacco", GROUP="physacco"
+#K-Touch
+SUBSYSTEM=="usb", ATTR{idVendor}=="24e3", MODE="0666", OWNER="physacco", GROUP="physacco"
+#KT Tech
+SUBSYSTEM=="usb", ATTR{idVendor}=="2116", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Kyocera
+SUBSYSTEM=="usb", ATTR{idVendor}=="0482", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Lenovo
+SUBSYSTEM=="usb", ATTR{idVendor}=="17ef", MODE="0666", OWNER="physacco", GROUP="physacco"
+#LG
+SUBSYSTEM=="usb", ATTR{idVendor}=="1004", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Motorola
+SUBSYSTEM=="usb", ATTR{idVendor}=="22b8", MODE="0666", OWNER="physacco", GROUP="physacco"
+#MTK
+SUBSYSTEM=="usb", ATTR{idVendor}=="0e8d", MODE="0666", OWNER="physacco", GROUP="physacco"
+#NEC
+SUBSYSTEM=="usb", ATTR{idVendor}=="0409", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Nook
+SUBSYSTEM=="usb", ATTR{idVendor}=="2080", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Nvidia
+SUBSYSTEM=="usb", ATTR{idVendor}=="0955", MODE="0666", OWNER="physacco", GROUP="physacco"
+#OTGV
+SUBSYSTEM=="usb", ATTR{idVendor}=="2257", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Pantech
+SUBSYSTEM=="usb", ATTR{idVendor}=="10a9", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Pegatron
+SUBSYSTEM=="usb", ATTR{idVendor}=="1d4d", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Philips
+SUBSYSTEM=="usb", ATTR{idVendor}=="0471", MODE="0666", OWNER="physacco", GROUP="physacco"
+#PMC-Sierra
+SUBSYSTEM=="usb", ATTR{idVendor}=="04da", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Qualcomm
+SUBSYSTEM=="usb", ATTR{idVendor}=="05c6", MODE="0666", OWNER="physacco", GROUP="physacco"
+#SK Telesys
+SUBSYSTEM=="usb", ATTR{idVendor}=="1f53", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Samsung
+SUBSYSTEM=="usb", ATTR{idVendor}=="04e8", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Sharp
+SUBSYSTEM=="usb", ATTR{idVendor}=="04dd", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Sony
+SUBSYSTEM=="usb", ATTR{idVendor}=="054c", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Sony Ericsson
+SUBSYSTEM=="usb", ATTR{idVendor}=="0fce", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Teleepoch
+SUBSYSTEM=="usb", ATTR{idVendor}=="2340", MODE="0666", OWNER="physacco", GROUP="physacco"
+#Toshiba
+SUBSYSTEM=="usb", ATTR{idVendor}=="0930", MODE="0666", OWNER="physacco", GROUP="physacco"
+#ZTE
+SUBSYSTEM=="usb", ATTR{idVendor}=="19d2", MODE="0666", OWNER="physacco", GROUP="physacco"

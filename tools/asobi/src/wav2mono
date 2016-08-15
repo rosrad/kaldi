@@ -1,0 +1,97 @@
+#!/usr/bin/env python
+
+import sys
+import wave
+import getopt
+
+def convert(input, leftout=None, rightout=None):
+    if not (leftout or rightout):
+        print 'error: output arguments unspecified'
+        return
+
+    wf = wave.open(input, 'rb')
+
+    nchannels = wf.getnchannels()
+    framerate = wf.getframerate()
+    sampwidth = wf.getsampwidth()
+    nframes = wf.getnframes()
+    framesize = nchannels * sampwidth
+
+    sys.stdout.write('Channels: %d\n' % nchannels)
+    sys.stdout.write('Frame rate: %d\n' % framerate)
+    sys.stdout.write('Sample width: %d\n' % sampwidth)
+    sys.stdout.write('Frames: %d\n' % nframes)
+
+    if not nchannels == 2:
+        print 'error: nchannels is %d' % nchannels
+        return
+
+    if leftout:
+        lwf = wave.open(leftout, 'wb')
+        lwf.setnchannels(1)
+        lwf.setframerate(framerate)
+        lwf.setsampwidth(sampwidth)
+        lwf.setnframes(nframes)
+
+    if rightout:
+        rwf = wave.open(rightout, 'wb')
+        rwf.setnchannels(1)
+        rwf.setframerate(framerate)
+        rwf.setsampwidth(sampwidth)
+        rwf.setnframes(nframes)
+
+    while True:
+        data = wf.readframes(framerate)
+        datalen = len(data)
+        framecnt = datalen / framesize
+        if framecnt <= 0:
+            break
+
+        ldata = ''
+        rdata = ''
+        for i in range(framecnt):
+            a = i * 2 * sampwidth
+            b = (i * 2 + 1) * sampwidth
+            c = (i + 1) * 2 * sampwidth
+            ldata += data[a:b]
+            rdata += data[b:c]
+
+        if leftout:
+            lwf.writeframes(ldata)
+
+        if rightout:
+            rwf.writeframes(rdata)
+
+def usage():
+    print 'wav2mono [Options] INPUT'
+
+def version():
+    print 'wav2mono 0.1.0'
+
+def main():
+    leftout = None
+    rightout = None
+    
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'hl:r:V',
+            ['help', 'left=', 'right=', 'version'])
+    except getopt.GetoptError, err:
+        show_usage()
+        sys.exit(1)
+
+    for o, a in opts:
+        if o in ('-h', '--help'):
+            usage()
+            exit()
+        elif o in ('-l', '--left'):
+            leftout = a
+        elif o in ('-r', '--right'):
+            rightout = a
+        elif o in ('-V', '--version'):
+            version()
+            exit()
+
+    convert(args[0], leftout, rightout)
+
+if __name__ == '__main__':
+    main()

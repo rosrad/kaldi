@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>A demo for De Casteljau's algorithm</title>
+</head>
+<body>
+  <h1>Drawing Bezier curve with De Casteljau's algorithm</h1>
+  <canvas width="480" height="320"></canvas>
+  <script type="text/javascript">
+  function lerp(x1, x2, t) {
+      if (t <= 0) {
+          return x1;
+      } else if (t >= 1) {
+          return x2;
+      } else {
+          return x1 * (1 - t) + x2 * t;
+      }
+  }
+
+  function lerp2(p1, p2, t) {
+      var x1, y1, x2, y2, xt, yt;
+      x1 = p1[0];
+      y1 = p1[1];
+      x2 = p2[0];
+      y2 = p2[1];
+      xt = lerp(x1, x2, t);
+      yt = lerp(y1, y2, t);
+      return [xt, yt];
+  }
+
+  function decas(points, t) {
+      var i, n, p1, p2, np, newPoints;
+
+      n = points.length;
+      if (n === 1) {
+          return points[0];
+      }
+
+      newPoints = [];
+      for (i = 0; i < n - 1; i += 1) {
+          p1 = points[i];
+          p2 = points[i + 1];
+          np = lerp2(p1, p2, t);
+          newPoints.push(np);
+      }
+
+      return decas(newPoints, t);
+  }
+
+  function bezierCurve(points, n) {
+      var i, m, t, np, newPoints;
+
+      if (points.length < 2 || n < 2) {
+          return [];
+      }
+
+      m = n - 1;
+      newPoints = [];
+      for (i = 0; i <= m; i += 1) {
+          t = i / m;
+          np = decas(points, t);
+          newPoints.push(np);
+      }
+
+      return newPoints;
+  }
+
+  function drawCurve(points) {
+      var i, canvas, ctx;
+      canvas = document.querySelector('canvas');
+      ctx = canvas.getContext('2d');
+      ctx.beginPath();
+      ctx.moveTo(points[0][0], points[0][1]);
+      for (i = 1; i < points.length; i += 1) {
+          ctx.lineTo(points[i][0], points[i][1]);
+      }
+      ctx.stroke();
+  }
+
+  function drawPoints(points) {
+      var i, canvas, ctx;
+      canvas = document.querySelector('canvas');
+      ctx = canvas.getContext('2d');
+      for (i = 0; i < points.length; i += 1) {
+          ctx.fillRect(points[i][0], points[i][1], 4, 4);
+      }
+  }
+
+  function drawBezierCurve(points) {
+      drawCurve(bezierCurve(points, 50));
+  }
+
+  function sysdrawBezierCurve(points) {
+      var canvas, ctx;
+      canvas = document.querySelector('canvas');
+      ctx = canvas.getContext('2d');
+      ctx.strokeStyle = '#ff0000';
+      ctx.translate(0, 30);
+      ctx.beginPath();
+      ctx.moveTo(points[0][0], points[0][1]);
+      ctx.bezierCurveTo(points[1][0], points[1][1],
+                        points[2][0], points[2][1],
+                        points[3][0], points[3][1]);
+      ctx.stroke();
+  }
+
+  var points = [[20, 20], [200, 200], [300, 20], [400, 100]];
+  drawPoints(points);
+  drawBezierCurve(points);
+  sysdrawBezierCurve(points);
+  </script>
+</body>
+</html>

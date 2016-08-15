@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Play local audio files</title>
+</head>
+<body>
+  <div>
+    <input type="file" id="file">
+  </div>
+  <script>
+    var playAudioFile = function (file) {
+        var reader = new window.FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function (evt) {
+            var audio = document.createElement("audio");
+            audio.src = evt.target.result;
+            // autoplay
+            audio.addEventListener("canplay", function () {
+                audio.play();
+            });
+        };
+    };
+
+    var file = document.getElementById("file");
+    file.addEventListener("change", function (evt) {
+        var file = evt.target.files[0];
+        if (file) {
+            playAudioFile(file);
+        }
+    });
+  </script>
+</body>
+</html>
