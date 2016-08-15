@@ -6,7 +6,7 @@ bits=16;
 pcm2wav=${KALDI_ROOT}/tools/pcm2wav/pcm2wav
 nlog=2
 doa=
-key='大白大白'
+key=''
 mk_gcc="yes"
 . parse_options.sh || exit 1;
 
@@ -44,7 +44,7 @@ do
         d=$doa
     fi
     d=$(( d/5 ))
-    cat $f|grep $key |awk -v r=${name%.*} -v d=$d '{print  r"_"$1, r, $1,$2,d}'
+    cat $f|grep "$key" |awk -v r=${name%.*} -v d=$d '{print  r"_"$1, r, $1,$2,d}'
 done > $data_dir/tmp.scp
 
 echo  $data_dir/segments

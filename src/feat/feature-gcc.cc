@@ -87,13 +87,20 @@ void XX_real(const VectorBase<BaseFloat>& e, const VectorBase<BaseFloat>& x,
         d(i) = e(j)*x(j) - e(j+1)*x(j+1);
 	}
 }
-
+void SubBand(const VectorBase<BaseFloat>& x,
+             VectorBase<BaseFloat>& y) {
+    int32 width = x.Dim()/y.Dim();
+    for( int32 i=0; i < y.Dim(); i++) {
+        y(i) = x.Range(i*width, width).Sum();
+    }
+}
 
 void PhatGCC::Compute(const MatrixBase<BaseFloat>&  wav,
                       Matrix<BaseFloat>& feature) {
     // extract window
     int32 wlen= mic_.wlen;
     int32 nbin = wlen/2;
+    int32 nsub = sqrt(nbin);
     int32 nsample = wav.NumCols();
     int32 nchan = wav.NumRows();
     int32 nshift = wlen/2;
@@ -105,9 +112,9 @@ void PhatGCC::Compute(const MatrixBase<BaseFloat>&  wav,
     Matrix<BaseFloat> x;
 
     Vector<BaseFloat> P(nbin*2);
-    Vector<BaseFloat> F(ntheta);
-    Matrix<BaseFloat> real_cc(ntheta, nbin);
-    feature.Resize(nbin,ntheta*npair);
+    // Vector<BaseFloat> F(ntheta);
+    Vector<BaseFloat> real_CC(nsub*ntheta);
+    feature.Resize(nfrm,ntheta*nsub);
     
     for (int32 i = 0; i < nfrm; i++) {
         x = wav.ColRange(i*nshift,wlen);
@@ -127,12 +134,12 @@ void PhatGCC::Compute(const MatrixBase<BaseFloat>&  wav,
             for (int32 r=0; r < exp.NumRows(); r++) {
                 Vector<BaseFloat> row(nbin);
                 XX_real(exp.Row(r), P, row);
-                for ( int v=0;  v < nbin; v++ ) {
-                    feature(v, r*npair+k)+= row(v);
-                }
+                SubVector<BaseFloat> sub_row(real_CC, r*nsub, nsub);
+                SubBand(row,sub_row);
             }
-
+            feature.Row(i).AddVec(1,real_CC);
         }
+        
     }
 }
 
