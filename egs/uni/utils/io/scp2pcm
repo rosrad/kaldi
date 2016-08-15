@@ -1,0 +1,60 @@
+#!/usr/bin/env python
+import os
+import sys
+import wave
+import shutil
+import wav2pcm
+from kaldi_io import open_or_fd
+
+def read_wav_scp(file_or_fd):
+    fd = open_or_fd(file_or_fd)
+    try:
+        for line in fd:
+            (key,rxfile) = line.split(' ')
+            yield rxfile.rstrip()
+    finally:
+        if fd is not file_or_fd : fd.close()
+            
+
+def copy_wav(input, wf):
+    wf = wave.open(f, 'rb')
+    nchannels = wf.getnchannels()
+    framerate = wf.getframerate()
+    sampwidth = wf.getsampwidth()
+    sys.stdout.write('Channels: %d\n' % nchannels)
+    sys.stdout.write('Frame rate: %d\n' % framerate)
+    sys.stdout.write('Sample width: %d\n' % sampwidth)
+    sys.stdout.write('==============================\n')    
+    nframes = wav2pcm.transfer(wf, outf, nchannels, framerate, sampwidth)
+    wf.close()           
+
+def copy_pcm(input, wf):
+    with open(input, 'rb') as inf:
+        shutil.copyfileobj(inf, wf)
+
+
+    
+def read_pcm_from_scp(input, output):
+    with open(output, 'w') as outf:
+        for f in read_wav_scp(input):
+            sys.stdout.write('Wave file: %s\n' % f)
+            name, ext = os.path.splitext(f)
+            if ext.lower() == '.wav':
+                copy_wav(f, outf)
+            else if ext.lower() == '.pcm':
+                copy_pcm(f, outf)
+            else:
+                assert 0, '%s is not supported files '% ext
+
+def usage():
+    print 'scp2pcm test.scp test.pcm '
+
+def main():
+    if len(sys.argv) < 3:
+        usage()
+        exit(1)
+
+    read_pcm_from_scp(sys.argv[1], sys.argv[2])
+
+if __name__ == '__main__':
+    main()
