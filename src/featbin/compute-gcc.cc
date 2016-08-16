@@ -20,7 +20,6 @@
 
 #include "base/kaldi-common.h"
 #include "util/common-utils.h"
-#include "feat/mic.h"
 #include "feat/feature-gcc.h"
 #include "feat/wave-reader.h"
 
@@ -35,10 +34,8 @@ int main(int argc, char *argv[]) {
 
 
         ParseOptions po(usage);
-        int32 wlen = 32;
-        int32 fs = 16000;
-        po.Register("wlen", &wlen, "window length");
-        po.Register("fs", &fs, "sampling frequency");
+        PhatGCCOptions opts;
+        opts.Register(&po);
 
         po.Read(argc, argv);
 
@@ -56,16 +53,7 @@ int main(int argc, char *argv[]) {
             KALDI_ERR << "Could not initialize output with wspecifier "
                       << output_wspecifier;
         }  
-
-        // array = [1,0;0,1;-1,0;0,-1]*d.';
-        std::vector<Pos> mic_pos;
-        BaseFloat r=0.035;
-        mic_pos.push_back(Pos(r,0));
-        mic_pos.push_back(Pos(0,r));
-        mic_pos.push_back(Pos(-r,0));
-        mic_pos.push_back(Pos(0,-r));
-        Mic mic(mic_pos, wlen, fs);
-        PhatGCC gcc(mic);
+        PhatGCC gcc(opts);
         int32 num_utts = 0, num_success = 0;
         for (; !reader.Done(); reader.Next()) {
             num_utts++;

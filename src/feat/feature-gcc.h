@@ -23,18 +23,39 @@
 
 #include <map>
 #include <string>
-#include <memory>
 
-#include "feat/mic.h"
 #include "feat/feature-common.h"
 #include "feat/feature-functions.h"
 #include "feat/feature-window.h"
 
 
+
+
+
+
+
 namespace kaldi {
+    /// @addtogroup  feat FeatureExtraction
+    /// @{
+    /// Class for computing mel-filterbank features; see \ref feat_mfcc for more
+    /// information.
+
+
+    struct PhatGCCOptions {
+
+        int32 wlen;
+        int32 nmic;
+        PhatGCCOptions(): wlen(512), nmic(4){}
+        int32 NumPair() { return nmic*(nmic-1)/2;}
+        void Register(OptionsItf *opts) {
+            opts->Register("wlen", &wlen, "window size for each fram");
+            opts->Register("nmic", &nmic, "number of microphone elements");
+        }
+    };
+
     class PhatGCC {
   public:
-        PhatGCC(Mic& mic);
+        explicit PhatGCC(const PhatGCCOptions& opts);
         PhatGCC(const PhatGCC &other);
         /**
            Function that computes one frame of features from
@@ -47,14 +68,15 @@ namespace kaldi {
            the computed feature will be written.
         */
         void Compute(const MatrixBase<BaseFloat>& wav, Matrix<BaseFloat>&  feature);
-        int32 Dim() { return mic_.Pairs().size() * mic_.ntheta; }
+        int32 Dim() { return opts_.NumPair() * opts_.wlen/2; }
         ~PhatGCC();
 
   private:
         SplitRadixRealFft<BaseFloat>* srfft_;
-        Mic& mic_;
+        PhatGCCOptions opts_;
+        typedef std::vector<std::pair<int32,int32> > PairVec;
+        PairVec pairs_;
         Vector<BaseFloat> win_;
-
         PhatGCC &operator =(const PhatGCC &other);
     };
 
