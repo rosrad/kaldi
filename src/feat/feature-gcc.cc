@@ -77,11 +77,27 @@ void norm_X(Vector<BaseFloat>& x)
 	}
 }
 
+void SubBand(const VectorBase<BaseFloat>& x,
+             VectorBase<BaseFloat>& y) {
+    int32 width = x.Dim()/y.Dim();
+    for( int32 i=0; i <y.Dim()/2; i++) {
+        
+        BaseFloat sum_real, sum_img;
+        for (int32 j=0; j<width*2; j+=2) {
+            sum_real += x(i*width*2+j);
+            sum_img += x(i*width*2+j+1);
+        }            
+        y(2*i) = sum_real/width;
+        y(2*i+1) = sum_img/width;
+    }
+}
 
 void PhatGCC::Compute(const MatrixBase<BaseFloat>&  wav,
                       Matrix<BaseFloat>& feature) {
     // extract window
     int32 wlen = opts_.wlen;
+    int32 nbin = wlen/2;
+    int32 nsub = sqrt(nbin);
     int32 nsample = wav.NumCols();
     int32 nchan = wav.NumRows();
     int32 npair = opts_.NumPair();
@@ -89,11 +105,9 @@ void PhatGCC::Compute(const MatrixBase<BaseFloat>&  wav,
     int32 nfrm = (nsample-wlen)/nshift + 1;
     
     Matrix<BaseFloat> x;
-
-    int32 minbin=25;
-    int32 nbin = 200-25;
     Vector<BaseFloat> P(nbin*2);
-    feature.Resize(nfrm,nbin*2);
+    Vector<BaseFloat> sub_P(nsub*2);
+    feature.Resize(nfrm,nsub*2*npair);
 
     for (int32 i = 0; i < nfrm; i++) {
         x = wav.ColRange(i*nshift,wlen);
@@ -106,10 +120,10 @@ void PhatGCC::Compute(const MatrixBase<BaseFloat>&  wav,
             int32 id0 = pairs_[k].first;
             int32 id1 = pairs_[k].second;
 
-            spec_XXt(x.Row(id0).Range(minbin*2, nbin*2),
-                     x.Row(id1).Range(minbin*2, nbin*2), P);
+            spec_XXt(x.Row(id0), x.Row(id1), P);
             norm_X(P);
-            feature.Row(i).AddVec(1,P);
+            SubBand(P, sub_P);
+            feature.Row(i).Range(k*2*nsub, 2*nsub).CopyFromVec(sub_P);
         }
     }
 }
