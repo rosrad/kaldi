@@ -38,7 +38,7 @@ def write_list(f, l):
         for i in l:
             wf.write(i+'\n')
 
-def decode_dir(nnet, data)
+def decode_dir(nnet, data):
     parts = data.split('/')
     parts.insert(0,'decode')
     return path.join(nnet, "_".join(parts))

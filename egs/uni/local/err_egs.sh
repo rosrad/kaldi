@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-echo $#
 if [[ $# < 2 ]] ;then
     echo "No enough args ! "
     echo "Usage: $0 decode_dir data_dir"
@@ -30,7 +29,12 @@ done
 
 for tag in err correct
 do
-    echo "working on $tag ..."
+    echo "----------------------------------------------"
+    echo "working on ..."
+    echo "$tag"
+    echo "$dir"
+    echo "----------------------------------------------"
+
     key=${tag}.keys
     tag_dir=$dir/${tag}
 
@@ -42,7 +46,7 @@ do
     do
         [ ! -f $data/$f ] && continue # if not such file, skip it;
         # if exist filter it by error keys
-        echo "filtering $f"
+        # echo "filtering $f"
         ./utils/filter_scp.pl $dir/${key} $data/$f > $tag_dir/$f
     done
 
