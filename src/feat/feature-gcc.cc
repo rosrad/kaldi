@@ -97,7 +97,7 @@ void PhatGCC::Compute(const MatrixBase<BaseFloat>&  wav,
     // extract window
     int32 wlen = opts_.wlen;
     int32 nbin = wlen/2;
-    int32 nsub = sqrt(nbin);
+    int32 nsub = opts_.nsub;
     int32 nsample = wav.NumCols();
     int32 nchan = wav.NumRows();
     int32 npair = opts_.NumPair();

@@ -45,11 +45,13 @@ namespace kaldi {
 
         int32 wlen;
         int32 nmic;
-        PhatGCCOptions(): wlen(512), nmic(4){}
+        int32 nsub;
+      PhatGCCOptions(): wlen(512), nmic(4), nsub(64) {}
         int32 NumPair() { return nmic*(nmic-1)/2;}
         void Register(OptionsItf *opts) {
             opts->Register("wlen", &wlen, "window size for each fram");
             opts->Register("nmic", &nmic, "number of microphone elements");
+            opts->Register("nsub", &nsub, "number of subband");
         }
     };
 
