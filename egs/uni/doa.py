@@ -3,7 +3,7 @@
 import os.path as path
 import utils
 import sys
-from local import compute_error
+from local import collect_error
 from optparse import OptionParser  
 
 parser = OptionParser()
@@ -33,16 +33,26 @@ sets.append(["recording/20151010", "大白大白"])
 sets.append(["recording/20160623_4chans", "你好魔方"])
 sets.append(["recording/20160517_after_aec", "你好魔方"])  # 
 
+def write_list(f, l):
+    with open(f, 'wb') as wf:
+        for i in l:
+            wf.write(i+'\n')
+
+    
 def collect_er(nnet, data):
     parts = data.split('/')
     parts.insert(0,'decode')
     reg = path.join(nnet, "_".join(parts),
                     'decode.result')
+    err_keys = path.join(nnet, "_".join(parts),
+                         "err.keys")
     ref = path.join(data, 'utt2doa')
-    er = compute_error(reg, ref)
+    (er,errors) = collect_error(reg, ref)
+
+    write_list(err_keys, errors)
     print "="*50
-    print "Nnet : %s" % nnet
-    print "data : %s" % data
+    print "decoded : %s" % reg
+    print "ref : %s" % ref
     print "error: %.2f" % er
     print "="*50
     return
@@ -66,5 +76,6 @@ def oneset(s):
     # print cmd
     utils.runbash(cmd)
     collect_er(nnet, data)
+    
 
 utils.gmap(oneset, sets, 4)

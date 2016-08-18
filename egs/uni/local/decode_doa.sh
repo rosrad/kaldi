@@ -54,5 +54,5 @@ cat $decode_dir/split$nj/decode.*.result > $decode_dir/decode.result
 rm $decode_dir/split$nj -fr
 
 # compute doa recognition err rate
-# err=$(./local/compute_er.py $decode_dir/decode.result $data/utt2doa)
-# echo $data : $err
+err=$(./local/compute_er.py $decode_dir/decode.result $data/utt2doa)
+echo $data : $err
