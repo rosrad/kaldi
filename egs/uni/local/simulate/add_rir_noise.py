@@ -103,8 +103,8 @@ def main():
         exit;
 
 
-    src_dir=sys.argv[0]
-    dst_dir=sys.argv[1]
+    src_dir=args[0]
+    dst_dir=args[1]
     rir_dir=args[2]
     
     if nargs == 4:
