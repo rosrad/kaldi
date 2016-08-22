@@ -10,6 +10,7 @@
 . ./path.sh
 . ./cmd.sh
 
+once="yes"
 . utils/parse_options.sh || exit 1;
 
 echo "$0 $@"  # Print the command line for logging
@@ -24,7 +25,7 @@ corpus="/home/renbo/work/corpus/uni_doa/"
 
 rir=${corpus}/rir/
 src=${corpus}/Wakeup_words_vad/
-for t60 in $(seq 0.3 0.1 1.5)
+for t60 in $(seq 1.8 0.1 1.8)
 do
     rir=${corpus}/rir/t60_${t60}
     if [ ! -d $rir ] ;then
@@ -33,7 +34,13 @@ do
     fi
     dst=${corpus}/simu/reverb/t60_${t60}
     [ ! -d $dst ] && mkdir -p $dst
-    echo ./local/simulate/add_rir_noise.py -o  $src $dst $rir    
-    ./local/simulate/add_rir_noise.py -o  $src $dst $rir
+    opts=""
+    if [[ $once == "yes" ]] ;then
+        opts+=" -o "
+    fi
+    cmd="./local/simulate/add_rir_noise.py $opts $src $dst $rir"
+    echo $cmd
+    $cmd
+    # ./local/simulate/add_rir_noise.py -o $src $dst $rir
 done
 

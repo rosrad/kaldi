@@ -37,12 +37,14 @@ def mix(src_f, dst_f, ir, n, fs=16000):
     
     out=np.zeros((nsample,nchan))
 
+    # import pdb; pdb.set_trace()
+    
     for i in range(0,nchan):
         out[:,i]= fftconvolve(data, ir[:,i], 'same')[0:nsample]
 
     ensure_parent(dst_f)
     # out.tofile(dst_f)
-    wavfile.write(dst_f,fs, out)
+    wavfile.write(dst_f,fs, np.int16(out*(2**15)))
 
 
 
