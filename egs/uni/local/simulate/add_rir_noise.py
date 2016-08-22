@@ -27,8 +27,20 @@ def audio_read(f):
 
     return data/(2.**15)
         
-    
-    
+
+def audio_write(f, data,fs=16000):
+    [n, ext] = path.splitext(f)
+    if ext.lower() == '.pcm':
+        sys.stderr.write("Do not support pcm writer")
+        return False
+
+    dkind = data.dtype.kind
+    if dkind == 'f':        # assumed kind is float
+        data = np.int16(data*(2**15))
+
+    wavfile.write(f,fs,data)
+    return True
+        
 def mix(src_f, dst_f, ir, n, fs=16000):
     
     nchan = ir.shape[1]
@@ -37,14 +49,12 @@ def mix(src_f, dst_f, ir, n, fs=16000):
     
     out=np.zeros((nsample,nchan))
 
-    # import pdb; pdb.set_trace()
-    
     for i in range(0,nchan):
         out[:,i]= fftconvolve(data, ir[:,i], 'same')[0:nsample]
 
     ensure_parent(dst_f)
-    # out.tofile(dst_f)
-    wavfile.write(dst_f,fs, np.int16(out*(2**15)))
+    audio_write(dst_f,out,fs)
+    # wavfile.write(dst_f,fs, np.int16(out*(2**15)))
 
 
 
@@ -88,7 +98,7 @@ def test():
     rir = rir_dict(rir_dir)
     mix_dir(src_dir,dst_dir,rir, once=True)
 
-# test()
+test()
 
 def main():
 
