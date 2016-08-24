@@ -9,7 +9,7 @@ echo "$0 $@"  # Print the command line for logging
 # parameters initialized
 hid_layers=3
 hid_dim=512
-num_tgt=72
+num_tgt=360
 cmd=utils/run.pl
 . parse_options.sh || exit 1;
 

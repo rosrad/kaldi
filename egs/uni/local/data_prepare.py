@@ -24,6 +24,8 @@ def read_table(f):
     return d
     
 def write_table(f,d):
+    if not d:
+        return
     with open(f, 'wb') as wf:
         for k in sorted(d):
             v = d[k]
@@ -43,18 +45,26 @@ def build_data(src, data, ext="wav",filter=""):
     # with open(wav_scp, 'w') as wf:
     wav_dict = {}
     segment_dict = {}
+    idx = 0
     for f in audio_list(src,ext):
         name,ext = path.splitext(f)
         key = name.replace("/","_")
-        print key
+        idx +=1
         if ext.lower() == '.wav':
             wav_dict[key]=[path.join(src, f)]
+            if idx %50 ==0:
+                print "."
+            else:
+                print ".",
         else:
+            print key
             wav_dict[key] = pcm_pipeline(path.join(src, f))
             # we need the segment lable
             label = path.join(src, name+".txt")
             segment_dict.update(segment(key, label,filter))
 
+        print ""
+        
     keys = wav_dict.keys()
     if segment_dict:
         keys = segment_dict.keys()
