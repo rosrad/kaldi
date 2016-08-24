@@ -1,0 +1,72 @@
+#!/usr/bin/env python
+
+import sys,subprocess,os
+import os.path as path
+from optparse import OptionParser  
+import soundfile as sf
+import numpy as np
+
+def ensure_dir(d):
+    if not  path.isdir(d):
+        os.makedirs(d)
+        
+def audio_list(folder, ext):
+    cmd = ' '.join(['find', folder, '-type f', '-iname', '*.'+ext ])
+    out =  subprocess.check_output(cmd, shell=True)
+    return [ x.replace(folder,'./') for x in out.rstrip().split('\n') ]
+
+
+def sub_audio(src, label, out, nchan, fs=16000):
+    segment = np.loadtxt(label)
+    name,ext = path.splitext(path.basename(src))
+    for i in range(len(segment)):
+        tstart=segment[i,0]
+        tend=segment[i,1]
+        nstart = int(tstart*fs)
+        nfrm = int((tend-tstart)*fs)
+        if nfrm < fs/2:         # if nfrm is too short, skip it;
+            sys.stderr.write("[warning] skip segments ")
+            sys.stderr.write("[%.4f - %.4f] with %d frames\n"%(tstart,tend, nfrm))
+            continue
+
+        data,fs = sf.read(src,nfrm, nstart,format="RAW",
+                          channels=nchan, samplerate=fs,
+                          subtype="PCM_16")
+        dst = path.join(out, name+"_%f.wav"%tstart)
+        sf.write(dst, data,fs)
+    
+
+def walk_dir(src_dir, dst_dir, nchan, fs = 16000):
+
+    for f in audio_list(src_dir, 'pcm'):
+        src_f = path.join(src_dir,f)
+        print src_f
+        out = path.join(dst_dir,path.dirname(f))
+        label_f = path.splitext(src_f)[0]+".txt"
+        ensure_dir(out)
+        sub_audio(src_f, label_f, out, nchan, fs)
+
+def test():
+    src_f = "/home/renbo/work/corpus/uni_doa/recording/20160823/quiet_nihaomofang_70c/demo10.pcm"
+    label_f = "/home/renbo/work/corpus/uni_doa/recording/20160823/quiet_nihaomofang_70c/demo10.txt"
+    out_dir = "/home/renbo/work/test_new/"
+    ensure_parent(out_dir)
+    sub_audio(src_f, label_f, out_dir, 4)
+# test()
+    
+def main():
+    parser = OptionParser(usage="usage: %prog src_dir dst_dir")  
+    parser.add_option("-c", "--chan", dest="chan",
+                      action="store", type="int",
+                      help="number of channels", default=1)
+    parser.add_option("-f", "--framerate", dest="fs", type="int",
+                      action="store", help="sampling frequence",
+                      default=16000)
+    (options, args) = parser.parse_args()
+    if len(args) < 2:
+        parser.error("no enough arguments");
+        sys.exit(1)
+    walk_dir(args[0], args[1], options.chan, options.fs)
+        
+if __name__ == '__main__':
+    main()

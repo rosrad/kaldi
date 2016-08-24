@@ -4,6 +4,7 @@ import os.path as path
 import utils
 import sys
 from local import collect_error
+from local import build_all
 from optparse import OptionParser  
 
 parser = OptionParser()
@@ -29,10 +30,10 @@ if narg>=2:
 
 corpus="/home/renbo/work/corpus/uni_doa/"
 sets=[]
-sets.append(["recording/20151010", "大白大白"])
-sets.append(["recording/20160623_4chans", "你好魔方"])
-sets.append(["recording/20160517_after_aec", "你好魔方"])  # 
-
+sets.append(["recording/20151010", "大白大白", "pcm"])
+sets.append(["recording/20160623_4chans", "你好魔方", "pcm"])
+sets.append(["recording/20160517_after_aec", "你好魔方", "pcm"])  # 
+sets.append(["recording/2016_4mic", "","pcm"])  # 
 def write_list(f, l):
     with open(f, 'wb') as wf:
         for i in l:
@@ -69,13 +70,9 @@ def oneset(s):
         return
 
     if not  path.isfile(path.join(data, 'feats.scp')):
-        opts="--mk-gcc yes"
-        cmd=" ".join(["./local/data_prepare.sh",
-                      opts, "--key", s[1],
-                      path.join(corpus, s[0]), data])
-        # print cmd
-        utils.runbash(cmd)
-    
+        build_all(path.join(corpus, s[0]), data,
+                  ext=s[2], filter=s[1])
+        
     cmd=" ".join(["./local/decode_doa.sh",
                   nnet, data] )
     # print cmd

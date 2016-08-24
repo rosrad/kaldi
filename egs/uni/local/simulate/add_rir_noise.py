@@ -98,7 +98,7 @@ def test():
     rir = rir_dict(rir_dir)
     mix_dir(src_dir,dst_dir,rir, once=True)
 
-test()
+# test()
 
 def main():
 
