@@ -26,6 +26,7 @@ data=data/simu/${tag}/${set}
 
 ./local/uni_simu_data_prepare.sh $corpus_dir $data
 [ ! -f $data/feats.scp ] && ./steps/make_gcc.sh --nj 16 $data
+[ ! -f $data/cmvn.scp ] && ./steps/compute_cmvn_stats.sh $data
 ./local/randsub_tr_cv.sh $data ${data}_train ${data}_eval
 ./local/train_doa.sh ${data}_train exp/doa/${set}_${tag}
 ./local/decode_doa.sh exp/doa/${set}_${tag} ${data}_eval

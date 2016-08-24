@@ -45,7 +45,7 @@ rbm_l2penalty=0.0002  # L2 penalty (increases RBM-mixing rate)
 rbm_extra_opts=
 
 # data processing,
-copy_feats=true     # resave the features to tmpdir,
+copy_feats=false     # resave the features to tmpdir,
 copy_feats_tmproot=/tmp/kaldi.XXXX # sets tmproot for 'copy-feats',
 copy_feats_compress=true # compress feats while resaving
 
@@ -152,12 +152,12 @@ fi
 # read the features
 feats_tr="ark:copy-feats scp:$dir/train.scp ark:- |"
 
-# optionally add per-speaker CMVN
+# optionally add per-utterance  CMVN
 if [ ! -z "$cmvn_opts" ]; then
   echo "+ 'apply-cmvn' with '$cmvn_opts' using statistics : $data/cmvn.scp"
   [ ! -r $data/cmvn.scp ] && echo "Missing $data/cmvn.scp" && exit 1;
-  [ ! -r $data/utt2spk ] && echo "Missing $data/utt2spk" && exit 1;
-  feats_tr="$feats_tr apply-cmvn $cmvn_opts --utt2spk=ark:$data/utt2spk scp:$data/cmvn.scp ark:- ark:- |"
+  # [ ! -r $data/utt2spk ] && echo "Missing $data/utt2spk" && exit 1;
+  feats_tr="$feats_tr apply-cmvn $cmvn_opts scp:$data/cmvn.scp ark:- ark:- |"
 else
   echo "# 'apply-cmvn' not used,"
 fi

@@ -71,4 +71,7 @@ do
 done |sort -k1 > $data_dir/wav.scp
 head -n3 $data_dir/wav.scp
 
-[ $mk_gcc == "yes" ] && ./steps/make_gcc.sh --nj 16 $data_dir
+if [[ $mk_gcc == "yes" ]] ;then
+    ./steps/make_gcc.sh --nj 16 $data_dir
+    ./steps/compute_cmvn_stats.sh $data_dir
+fi

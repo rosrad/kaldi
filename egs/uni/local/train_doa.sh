@@ -40,14 +40,18 @@ fi
 
 labels="ark:generate-post scp:${data}/feats.scp ark:${data}/utt2doa ark:- |"
 # Pre-train DBN, i.e. a stack of RBMs
+# --cmvn-opts "--norm-vars" \
+
 dbn_dir=${dir}/pretrain
 dbn=${dbn_dir}/${hid_layers}.dbn
 if [ ! -f "$dbn" ]; then
     $cmd $dir/log/pretrain.log \
-        steps/nnet/pretrain_dbn.sh --splice 0 --nn-depth ${hid_layers} --hid-dim ${hid_dim} --rbm-iter 1 $data $dbn_dir 
+        steps/nnet/pretrain_dbn.sh --splice 0 \
+        --nn-depth ${hid_layers} --hid-dim ${hid_dim} --rbm-iter 1 $data $dbn_dir 
 fi
 $cmd $dir/log/train.log \
-    steps/nnet/train.sh --dbn ${dbn} --hid-layers 0 --learn-rate 0.00001  --splice 0 \
+    steps/nnet/train.sh --dbn ${dbn} --feature-transform "${dbn_dir}/final.feature_transform" \
+    --hid-layers 0 --learn-rate 0.00001  --splice 0 \
     --labels "${labels}"  --num-tgt ${num_tgt} \
     ${data}_tr90 ${data}_cv10 dummy-dir dummy-dir dummy-dir $dir
 

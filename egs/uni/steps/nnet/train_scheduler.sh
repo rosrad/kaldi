@@ -19,7 +19,7 @@ train_tool_opts="--minibatch-size=256 --randomizer-size=32768 --randomizer-seed=
 feature_transform=
 
 # learn rate scheduling,
-max_iters=100
+max_iters=20
 min_iters=0 # keep training, disable weight rejection, start learn-rate halving as usual,
 keep_lr_iters=0 # fix learning rate for N initial epochs, disable weight rejection,
 start_halving_impr=0.01
