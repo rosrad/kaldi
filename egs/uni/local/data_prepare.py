@@ -1,44 +1,41 @@
 #!/usr/bin/env python
-import sys,os,shutil
+import sys,os,shutil,re
 import os.path as path
 from optparse import OptionParser  
-# import numpy as np
-import re
+from kaldi_utils import *
 import subprocess
 
+# def pcm_pipeline(pcm, fs=16000,chan=4, byte=16):
+#     tool = "/work/local/renbo/kaldi/master//tools/pcm2wav/pcm2wav"
+#     return [tool, pcm, "- %d %d %d |"% (chan, fs, byte) ]
+# def work_root():
+#     return path.join(os.environ['KALDI_ROOT'], "egs/uni/")
 
-
-def pcm_pipeline(pcm, fs=16000,chan=4, byte=16):
-    tool = "/work/local/renbo/kaldi/master//tools/pcm2wav/pcm2wav"
-    return [tool, pcm, "- %d %d %d |"% (chan, fs, byte) ]
-def work_root():
-    return path.join(os.environ['KALDI_ROOT'], "egs/uni/")
-
-def read_table(f):
-    d = {}
-    with open(f, 'rb') as inf:
-        for line in inf:
-            parts = line.split()
-            d[parts[0]] = parts[1:]
+# def read_table(f):
+#     d = {}
+#     with open(f, 'rb') as inf:
+#         for line in inf:
+#             parts = line.split()
+#             d[parts[0]] = parts[1:]
             
-    return d
+#     return d
     
-def write_table(f,d):
-    if not d:
-        return
-    with open(f, 'wb') as wf:
-        for k in sorted(d):
-            v = d[k]
-            wf.write("%s %s\n"%(k, " ".join(v)))
+# def write_table(f,d):
+#     if not d:
+#         return
+#     with open(f, 'wb') as wf:
+#         for k in sorted(d):
+#             v = d[k]
+#             wf.write("%s %s\n"%(k, " ".join(v)))
     
-def ensure_dir(d):
-    if not  path.isdir(d):
-        os.makedirs(d)
+# def ensure_dir(d):
+#     if not  path.isdir(d):
+#         os.makedirs(d)
 
-def audio_list(folder, ext):
-    cmd = ' '.join(['find', folder, '-type f', '-iname', '*.'+ext ])
-    out =  subprocess.check_output(cmd, shell=True)
-    return [ path.relpath(x.replace(folder,'./')) for x in out.rstrip().split('\n') if x ]
+# def audio_list(folder, ext):
+#     cmd = ' '.join(['find', folder, '-type f', '-iname', '*.'+ext ])
+#     out =  subprocess.check_output(cmd, shell=True)
+#     return [ path.relpath(x.replace(folder,'./')) for x in out.rstrip().split('\n') if x ]
 
 def build_data(src, data, ext="wav",filter=""):
     ensure_dir(data)
@@ -91,14 +88,14 @@ def key2doa(keys, fixed=-1):
 
     return d
 
-def revert_table(d):
-    rd = {} 
-    for k,v in d.iteritems():
-        if v[0] in rd.keys():
-            rd[v[0]] = rd[v[0]]+[k]
-        else:
-            rd[v[0]] = [k]
-    return rd
+# def revert_table(d):
+#     rd = {} 
+#     for k,v in d.iteritems():
+#         if v[0] in rd.keys():
+#             rd[v[0]] = rd[v[0]]+[k]
+#         else:
+#             rd[v[0]] = [k]
+#     return rd
     
 def segment(k, f, filter=""):
     if not path.isfile(f):
@@ -118,14 +115,14 @@ def segment(k, f, filter=""):
 
     return d
     
-def mk_feat(data):
-    # make features
-    cmd = " ".join( [work_root()+"./steps/make_gcc.sh --nj 16",data])
-    subprocess.call(cmd, shell=True)
+# def mk_feat(data):
+#     # make features
+#     cmd = " ".join( [work_root()+"./steps/make_gcc.sh --nj 16",data])
+#     subprocess.call(cmd, shell=True)
 
-    # make cmvn
-    cmd = " ".join( [work_root()+"./steps/compute_cmvn_stats.sh", data])
-    subprocess.call(cmd, shell=True)
+#     # make cmvn
+#     cmd = " ".join( [work_root()+"./steps/compute_cmvn_stats.sh", data])
+#     subprocess.call(cmd, shell=True)
     
 def build_all(src, data, ext="wav", filter=""):
     build_data(src,data, ext,filter)

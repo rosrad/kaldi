@@ -25,7 +25,7 @@ corpus="/home/renbo/work/corpus/uni_doa/"
 
 rir=${corpus}/rir/
 src=${corpus}/Wakeup_words_vad/
-for t60 in $(seq 1.8 0.1 1.8)
+for t60 in $(seq 0.3 0.2 1.8)
 do
     rir=${corpus}/rir/t60_${t60}
     if [ ! -d $rir ] ;then

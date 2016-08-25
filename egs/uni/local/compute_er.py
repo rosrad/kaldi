@@ -3,8 +3,7 @@ import sys
 import kaldi_io
 from optparse import OptionParser  
 
-
-def collect_error(reg, ref, offset=6):
+def collect_error(reg, ref, offset=30):
     reg_dict={k:v for k,v in kaldi_io.read_vec_int_ark(reg)}
     keys=reg_dict.keys()
     errors=[]
@@ -17,21 +16,20 @@ def collect_error(reg, ref, offset=6):
     return (er, errors)
 
 
-def compute_error(reg, ref, offset=6):
+def compute_error(reg, ref, offset=30):
     (er, errors) = collect_error(reg, ref, offset)
     return er
 
 def main():
-    parser = OptionParser()  
+    parser = OptionParser(usage="usage: %prog reg ref")  
     parser.add_option("-c", "--collect-error", dest="collect",
                       action="store_true", default=False)
 
     (options, args) = parser.parse_args()  
     narg = len(args)
     if narg < 2:
-        print "No enough parameters"
-        print "compute_er.py [-options] reg ref"
-        sys.exit()
+        parser.error("No enough parameters")
+        sys.exit(1)
     if narg < 3:
         offset=30;
     else:
@@ -39,7 +37,7 @@ def main():
 
     reg = args[0];
     ref = args[1];
-    offset=offset/5;
+    # offset=offset/5;
     (er,errors) = collect_error(reg,ref, offset)
     if options.collect:
         for k in errors:
