@@ -114,7 +114,7 @@ function do_filtering {
   [ -f $srcdir/utt2warp ] && utils/filter_scp.pl $destdir/utt2spk <$srcdir/utt2warp >$destdir/utt2warp
   [ -f $srcdir/text ] && utils/filter_scp.pl $destdir/utt2spk <$srcdir/text >$destdir/text
   [ -f $srcdir/spk2gender ] && utils/filter_scp.pl $destdir/spk2utt <$srcdir/spk2gender >$destdir/spk2gender
-  [ -f $srcdir/cmvn.scp ] && utils/filter_scp.pl $destdir/utt2spk <$srcdir/cmvn.scp >$destdir/cmvn.scp
+  [ -f $srcdir/cmvn.scp ] && utils/filter_scp.pl $destdir/spk2utt <$srcdir/cmvn.scp >$destdir/cmvn.scp
   if [ -f $srcdir/segments ]; then
      utils/filter_scp.pl $destdir/utt2spk <$srcdir/segments >$destdir/segments
      awk '{print $2;}' $destdir/segments | sort | uniq > $destdir/reco # recordings.

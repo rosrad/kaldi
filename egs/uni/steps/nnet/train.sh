@@ -207,13 +207,13 @@ fi
 feats_tr="ark:copy-feats scp:$dir/train.scp ark:- |"
 feats_cv="ark:copy-feats scp:$dir/cv.scp ark:- |"
 
-# optionally add per-utt CMVN,
+# optionally add per-speaker CMVN,
 if [ ! -z "$cmvn_opts" ]; then
   echo "# + 'apply-cmvn' with '$cmvn_opts' using statistics : $data/cmvn.scp, $data_cv/cmvn.scp"
   [ ! -r $data/cmvn.scp ] && echo "Missing $data/cmvn.scp" && exit 1;
   [ ! -r $data_cv/cmvn.scp ] && echo "Missing $data_cv/cmvn.scp" && exit 1;
-  feats_tr="$feats_tr apply-cmvn $cmvn_opts  scp:$data/cmvn.scp ark:- ark:- |"
-  feats_cv="$feats_cv apply-cmvn $cmvn_opts  scp:$data_cv/cmvn.scp ark:- ark:- |"
+  feats_tr="$feats_tr apply-cmvn $cmvn_opts --utt2spk=ark:$data/utt2spk scp:$data/cmvn.scp ark:- ark:- |"
+  feats_cv="$feats_cv apply-cmvn $cmvn_opts --utt2spk=ark:$data_cv/utt2spk scp:$data_cv/cmvn.scp ark:- ark:- |"
 else
   echo "# 'apply-cmvn' is not used,"
 fi

@@ -101,14 +101,14 @@ elif [ ! -z "$fake_dims" ]; then
     modify-cmvn-stats "$fake_dims" ark:- ark,scp:$cmvndir/cmvn_$name.ark,$cmvndir/cmvn_$name.scp && \
     echo "Error computing (partially fake) CMVN stats" && exit 1;
 else
-  ! compute-cmvn-stats  scp:$data/feats.scp ark,scp:$cmvndir/cmvn_$name.ark,$cmvndir/cmvn_$name.scp \
+  ! compute-cmvn-stats --spk2utt=ark:$data/spk2utt scp:$data/feats.scp ark,scp:$cmvndir/cmvn_$name.ark,$cmvndir/cmvn_$name.scp \
     2> $logdir/cmvn_$name.log && echo "Error computing CMVN stats" && exit 1;
 fi
 
 cp $cmvndir/cmvn_$name.scp $data/cmvn.scp || exit 1;
 
 nc=`cat $data/cmvn.scp | wc -l`
-nu=`cat $data/utt2spk | wc -l`
+nu=`cat $data/spk2utt | wc -l`
 if [ $nc -ne $nu ]; then
   echo "$0: warning: it seems not all of the speakers got cmvn stats ($nc != $nu);"
   [ $nc -eq 0 ] && exit 1;
