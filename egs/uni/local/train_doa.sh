@@ -11,6 +11,7 @@ hid_layers=3
 hid_dim=512
 num_tgt=360
 cmd=utils/run.pl
+cmvn_opts="--norm-means"
 . parse_options.sh || exit 1;
 
 echo "$0 $@"  # Print the command line for logging
@@ -46,7 +47,8 @@ dbn_dir=${dir}/pretrain
 dbn=${dbn_dir}/${hid_layers}.dbn
 if [ ! -f "$dbn" ]; then
     $cmd $dir/log/pretrain.log \
-        steps/nnet/pretrain_dbn.sh --splice 0 \
+    steps/nnet/pretrain_dbn.sh --splice 0 \
+        --cmvn-opts ${cmvn_opts} \
         --nn-depth ${hid_layers} --hid-dim ${hid_dim} --rbm-iter 1 $data $dbn_dir 
 fi
 $cmd $dir/log/train.log \
