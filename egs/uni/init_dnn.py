@@ -11,7 +11,7 @@ def simu_root():
 
 def build_data(name, tag):
     audio_dir = path.join(simu_root(), "simu",name)
-    data_dir = path.join("data", "simu",tag,name)
+    data_dir = path.join("data",tag, "simu",name)
     if not path.isfile(path.join(data_dir, "feats.scp")):        
         build_all(audio_dir, data_dir, ext="wav")
     return data_dir

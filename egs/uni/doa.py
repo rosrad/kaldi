@@ -90,7 +90,7 @@ class Evaluator(object):
 
 
 
-def evaluate_all(nnet,tag, no_decode=True):
+def evaluate_all(nnet,tag, eval_only=True):
     sets=[]
     sets.append(["recording/20151010", "大白大白", "pcm"])
     sets.append(["recording/20160623_4chans", "你好魔方", "pcm"])
@@ -99,8 +99,8 @@ def evaluate_all(nnet,tag, no_decode=True):
     sets.append(["recording/20160810_aec_4chans", "你好魔方","out"])  #
     for s in sets:
         ev = Evaluator(s[0],tag, s[2], s[1] )
-        if no_decode:
-            ev.eval(nnet)
+        if eval_only:
+            ev.eval(nnet,mk_egs=False)
         else:
             ev.decode_eval(nnet)
         print ev
@@ -108,8 +108,8 @@ def evaluate_all(nnet,tag, no_decode=True):
 
 def main():
     p = OptionParser(usage="usage: %prog exp tag")
-    p.add_option("-n", "--no-decode",  
-                  action="store_true", dest="no_decode", default=False,  
+    p.add_option("-e", "--eval-only",  
+                  action="store_true", dest="eval_only", default=False,  
                   help="no decode step")  
 
     (opt, args) = p.parse_args()
@@ -118,7 +118,7 @@ def main():
         p.error("No enough parameters")
         sys.exit(1)
 
-    evaluate_all(args[0], args[1], opt.no_decode)
+    evaluate_all(args[0], args[1], opt.eval_only)
     
 
 if __name__ == "__main__":

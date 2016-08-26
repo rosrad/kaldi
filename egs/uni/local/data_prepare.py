@@ -49,7 +49,7 @@ def build_data(src, data, ext="wav",filter=""):
         idx +=1
         if ext.lower() == '.wav':
             wav_dict[key]=[path.join(src, f)]
-            if idx %50 ==0:
+            if idx %50 == 0:
                 print "."
             else:
                 print ".",
@@ -60,7 +60,8 @@ def build_data(src, data, ext="wav",filter=""):
             label = path.join(src, name+".txt")
             segment_dict.update(segment(key, label,filter))
 
-        print ""
+
+    print ""
         
     keys = wav_dict.keys()
     if segment_dict:
