@@ -60,7 +60,7 @@ dir=$6
 [ ! -d $dir/nnet ] && mkdir $dir/nnet
 
 # Skip training
-[ -e $dir/final.nnet ] && echo "'$dir/final.nnet' exists, skipping training" && exit 0
+# [ -e $dir/final.nnet ] && echo "'$dir/final.nnet' exists, skipping training" && exit 0
 
 ##############################
 # start training

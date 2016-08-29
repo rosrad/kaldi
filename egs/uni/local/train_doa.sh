@@ -4,12 +4,13 @@
 set -e # exit on error
 . cmd.sh
 . path.sh # source the path.
-echo "$0 $@"  # Print the command line for logging
 # ++++++++++++++++++++++++++++++++++++++++++++++++++
 # parameters initialized
 hid_layers=3
 hid_dim=512
 num_tgt=360
+splice=5
+force="no"
 cmd=utils/run.pl
 cmvn_opts="--norm-means"
 . parse_options.sh || exit 1;
@@ -45,16 +46,19 @@ labels="ark:generate-post scp:${data}/feats.scp ark:${data}/utt2doa ark:- |"
 
 dbn_dir=${dir}/pretrain
 dbn=${dbn_dir}/${hid_layers}.dbn
-if [ ! -f "$dbn" ]; then
+if [[ ! -e "$dbn" || $force == "yes" ]]; then
+    echo "pretraining RBM ..."
     $cmd $dir/log/pretrain.log \
-    steps/nnet/pretrain_dbn.sh --splice 0 \
+    steps/nnet/pretrain_dbn.sh --splice ${splice} \
         --cmvn-opts ${cmvn_opts} \
         --nn-depth ${hid_layers} --hid-dim ${hid_dim} --rbm-iter 1 $data $dbn_dir 
 fi
+
 $cmd $dir/log/train.log \
     steps/nnet/train.sh --dbn ${dbn} --feature-transform "${dbn_dir}/final.feature_transform" \
     --hid-layers 0 --learn-rate 0.00001  --splice 0 \
     --labels "${labels}"  --num-tgt ${num_tgt} \
+    --force "${force}" \
     ${data}_tr90 ${data}_cv10 dummy-dir dummy-dir dummy-dir $dir
 
 

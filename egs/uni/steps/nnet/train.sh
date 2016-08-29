@@ -8,6 +8,7 @@
 config=             # config, also forwarded to 'train_scheduler.sh',
 
 # topology, initialization,
+force="no"      # force retrain dnn
 network_type=dnn    # select type of neural network (dnn,cnn1d,cnn2d,lstm),
 hid_layers=4        # nr. of hidden layers (before sotfmax or bottleneck),
 hid_dim=1024        # number of neurons per layer,
@@ -50,7 +51,7 @@ frame_weights=     # per-frame weights for gradient weighting,
 utt_weights=       # per-utterance weights (scalar for --frame-weights),
 
 # data processing, misc.
-copy_feats=true     # resave the train/cv features into /tmp (disabled by default),
+copy_feats=false     # resave the train/cv features into /tmp (disabled by default),
 copy_feats_tmproot=/tmp/kaldi.XXXX # sets tmproot for 'copy-feats',
 copy_feats_compress=true # compress feats while resaving
 seed=777            # seed value used for data-shuffling, nn-initialization, and training,
@@ -121,7 +122,7 @@ echo
 mkdir -p $dir/{log,nnet}
 
 # skip when already trained,
-if [ -e $dir/final.nnet ]; then
+if [[ -e $dir/final.nnet && $force == "no" ]]; then
   echo "SKIPPING TRAINING... ($0)"
   echo "nnet already trained : $dir/final.nnet ($(readlink $dir/final.nnet))"
   exit 0

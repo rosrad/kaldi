@@ -35,6 +35,10 @@ int main(int argc, char *argv[]) {
 
         ParseOptions po(usage);
         PhatGCCOptions opts;
+        bool subtract_mean = false;
+        bool cep = false;
+        po.Register("subtract-mean", &subtract_mean, "Subtract mean of each utterance.");
+        po.Register("cep", &cep, "extract cepstrum");
         opts.Register(&po);
 
         po.Read(argc, argv);
@@ -63,14 +67,22 @@ int main(int argc, char *argv[]) {
             try {
                 gcc.Compute(wave_data.Data(), feature);
             } catch (...) {
-                KALDI_WARN << "Failed to compute features for utterance "
+                KALDI_WARN << "Failed to compute feature for utterance "
                            << utt;
                 continue;
             }
+            if (subtract_mean) {
+                Vector<BaseFloat> mean(feature.NumCols());
+                mean.AddRowSumMat(1.0, feature);
+                mean.Scale(1.0 / feature.NumRows());
+                for (int32 i = 0; i < feature.NumRows(); i++)
+                    feature.Row(i).AddVec(-1.0, mean);
+            }
+
             kaldi_writer.Write(utt, feature);
             if (num_utts % 10 == 0)
                 KALDI_LOG << "Processed " << num_utts << " utterances";
-            KALDI_VLOG(2) << "Processed features for key " << utt;
+            KALDI_VLOG(2) << "Processed feature for key " << utt;
             num_success++;
         }
         KALDI_LOG << " Done " << num_success << " out of " << num_utts

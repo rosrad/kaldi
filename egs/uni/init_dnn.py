@@ -16,7 +16,7 @@ def build_data(name, tag):
         build_all(audio_dir, data_dir, ext="wav")
     return data_dir
 
-def run_dnn(data):
+def run_dnn(data, force=False):
     tr = data+"train"
     ev = data+"eval"
     # sub training data
@@ -25,10 +25,13 @@ def run_dnn(data):
     utils.runbash(cmd)
 
     dnn = path.join("exp",data.replace("/","_"))
-    print dnn
     # train dnn
+    opts=""
+    if force:
+        opts = "--force yes"
+
     cmd = " ".join(["./local/train_doa.sh",
-                    tr, dnn])
+                    opts, tr, dnn])
 
     print cmd
     utils.runbash(cmd)
@@ -52,6 +55,10 @@ def main():
                       action="store", default="gcc",
                       help="tag name")  
 
+    p.add_option( "-f","--force", dest="force",  
+                  action="store_true", default=False,
+                  help="force retrain dnn")  
+
     (opt, args) = p.parse_args()
     narg=len(args);
     if narg <1:
@@ -60,7 +67,7 @@ def main():
 
     data = build_data(args[0], opt.tag)
     print "run dnn on : [%s]"%data
-    run_dnn(data)
+    run_dnn(data, opt.force)
 
 
 if __name__ == "__main__":
