@@ -3,6 +3,11 @@
 本说明文档是用于说明基于DNN的声源定位
 
 # 整体调用流程
+    0.使用环境准备
+      KALDI_ROOT环境变量设置
+      egs:
+    export  KALDI_ROOT=/kaldi/master/
+    
     1. 训练数据准备及DNN训练
     ./init_dnn.py, 格式如下:
     ./init_dnn.py --tag [tagname] training_corpus_dirname
