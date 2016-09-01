@@ -95,8 +95,8 @@ def evaluate_all(nnet,tag, eval_only=True):
     # sets.append(["相对目录", "过滤单词", "后缀格式"])
     sets.append(["recording/20151010", "大白大白", "pcm"])
     sets.append(["recording/20160623_4chans", "你好魔方", "pcm"])
-    sets.append(["recording/20160517_after_aec", "你好魔方", "pcm"])  # 
-    sets.append(["recording/4mic_2016", "","pcm"])  #
+    # sets.append(["recording/20160517_after_aec", "你好魔方", "pcm"])  # 
+    # sets.append(["recording/4mic_2016", "","pcm"])  #
     sets.append(["recording/20160810_aec_4chans", "你好魔方","out"])  #
     for s in sets:
         ev = Evaluator(s[0],tag, s[2], s[1] )
