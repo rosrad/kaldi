@@ -10,7 +10,7 @@ def work_root():
     return path.join(os.environ['KALDI_ROOT'], "egs/uni/")
 
 def corpus_root():
-    if os.environ["CORPUS_ROOT"]:
+    if "CORPUS_ROOT" in os.environ:
         return os.environ["CORPUS_ROOT"]
     else:
         return "/home/renbo/work/corpus/uni_doa/"
