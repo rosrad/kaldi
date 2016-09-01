@@ -4,13 +4,14 @@ import os.path as path
 import utils
 import sys
 from local import build_all
+from local import corpus_root
 from optparse import OptionParser  
 
-def simu_root():
-    return "/home/renbo/work/corpus/uni_doa/"
+# def corpus_root():
+#     return "/home/renbo/work/corpus/uni_doa/"
 
 def build_data(name, tag):
-    audio_dir = path.join(simu_root(), "simu",name)
+    audio_dir = path.join(corpus_root(), "simu",name)
     data_dir = path.join("data",tag, "simu",name)
     if not path.isfile(path.join(data_dir, "feats.scp")):        
         build_all(audio_dir, data_dir, ext="wav")

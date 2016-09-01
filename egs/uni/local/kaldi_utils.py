@@ -4,11 +4,11 @@ import os.path as path
 import subprocess
 
 def pcm_pipeline(pcm, fs=16000,chan=4, byte=16):
-    tool = "/work/local/renbo/kaldi/master//tools/pcm2wav/pcm2wav"
+    tool = path.join(os.environ["KALDI_ROOT"],"tools/pcm2wav/pcm2wav")
     return [tool, pcm, "- %d %d %d |"% (chan, fs, byte) ]
-
 def work_root():
     return path.join(os.environ['KALDI_ROOT'], "egs/uni/")
+
 def corpus_root():
     return "/home/renbo/work/corpus/uni_doa/"
 
@@ -66,3 +66,5 @@ def mk_feat(data):
     cmd = " ".join( [work_root()+"./steps/compute_cmvn_stats.sh", data])
     subprocess.call(cmd, shell=True)
     
+
+
