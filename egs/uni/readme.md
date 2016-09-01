@@ -4,9 +4,8 @@
 
 # 整体调用流程
     0.使用环境准备
-      KALDI_ROOT环境变量设置
-      egs:
-    export  KALDI_ROOT=/kaldi/master/
+        KALDI_ROOT 环境变量,egs  export  KALDI_ROOT=/kaldi/master/
+        corpus_root 修改, 位于./local/kaldi_utils.py
     
     1. 训练数据准备及DNN训练
     ./init_dnn.py, 格式如下:
