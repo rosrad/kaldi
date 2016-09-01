@@ -10,7 +10,10 @@ def work_root():
     return path.join(os.environ['KALDI_ROOT'], "egs/uni/")
 
 def corpus_root():
-    return "/home/renbo/work/corpus/uni_doa/"
+    if os.environ["CORPUS_ROOT"]:
+        return os.environ["CORPUS_ROOT"]
+    else:
+        return "/home/renbo/work/corpus/uni_doa/"
 
 
 def decode_path(nnet, data):

@@ -7,9 +7,6 @@ from local import build_all
 from local import corpus_root
 from optparse import OptionParser  
 
-# def corpus_root():
-#     return "/home/renbo/work/corpus/uni_doa/"
-
 def build_data(name, tag):
     audio_dir = path.join(corpus_root(), "simu",name)
     data_dir = path.join("data",tag, "simu",name)
