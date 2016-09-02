@@ -1,7 +1,5 @@
 #!/usr/bin/bash
-
-
-
+. path.sh
 export KALDI_ROOT="/work/local/renbo/kaldi/master/"
 export CORPUS_ROOT="/home/renbo/work/corpus/uni_doa/"
 
