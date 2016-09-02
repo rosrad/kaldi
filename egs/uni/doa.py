@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-  
 import os.path as path
-import utils
 import sys
 from local import *
 from optparse import OptionParser  
@@ -26,7 +25,7 @@ def oneset(s):
     cmd=" ".join(["./local/decode_doa.sh",
                   nnet, data] )
     # print cmd
-    utils.runbash(cmd)
+    runbash(cmd)
     collect_er(nnet, data)
     mk_err(egs,data)
 
@@ -61,7 +60,7 @@ class Evaluator(object):
         cmd=" ".join(["./local/decode_doa.sh",
                   nnet, self.data] )
         # print cmd
-        utils.runbash(cmd)
+        runbash(cmd)
 
     def decode_eval(self,nnet):
         self._decode_dnn(nnet)
@@ -79,7 +78,7 @@ class Evaluator(object):
 
         if mk_egs:
             cmd=" ".join(['./local/err_egs.sh', self.wrk_dir, self.data])
-            utils.runbash(cmd)
+            runbash(cmd)
 
     def __repr__(self):
         return "\n".join(
@@ -105,7 +104,7 @@ def evaluate_all(nnet,tag, eval_only=True):
         else:
             ev.decode_eval(nnet)
         print ev
-        # utils.gmap(oneset, sets, 4)
+        # gmap(oneset, sets, 4)
 
 def main():
     p = OptionParser(usage="usage: %prog exp tag")

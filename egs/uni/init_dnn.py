@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-  
 import os.path as path
-import utils
+
 import sys
 from local import build_all
+from local import runbash
 from local import corpus_root
 from optparse import OptionParser  
 
@@ -20,7 +21,7 @@ def run_dnn(data, force=False):
     # sub training data
     cmd = " ".join(["./local/randsub_tr_cv.sh",
                    data,tr,ev])
-    utils.runbash(cmd)
+    runbash(cmd)
 
     dnn = path.join("exp",data.replace("/","_"))
     # train dnn
@@ -32,12 +33,12 @@ def run_dnn(data, force=False):
                     opts, tr, dnn])
 
     print cmd
-    utils.runbash(cmd)
+    runbash(cmd)
     # decode dnn
     cmd = " ".join(["./local/decode_doa.sh",
                     dnn, ev])
     print cmd
-    utils.runbash(cmd)
+    runbash(cmd)
     
 def test():
     name = "reverb/t60_1.8"
