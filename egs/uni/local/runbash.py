@@ -1,6 +1,4 @@
-import gevent.subprocess as sp
-import gevent
-from gevent.pool import Pool
+import subprocess as sp
 import sys
 
 from os.path import dirname
@@ -53,38 +51,4 @@ def runbash(cmd, file=None, cwd=None ):
             log.flush()
 
     return p.returncode
-
-
-class bash(object):
-    def __init__(self, file=None, cwd=None):
-        ""
-        self.cwd = cwd
-        self.file = file
-
-    def run(self, cmd, file=None):
-        if not file:
-            file=self.file
-        code = runbash(cmd,file=file,cwd=self.cwd)
-        return (code,file)
-
-# using the gevent lib implemented coroutine async
-def gmap(f, l, job=None):
-    if job:
-        p = Pool(job)
-        R = p.map(f,l)
-        p.join()
-    else:
-        G = [ gevent.spawn(f, i) for i in l ]
-        gevent.joinall(G)
-        R = [ g.value for g in G]
-
-    return  R
-
-def deep_run(func, l):
-    if not l:
-        return
-    if isinstance(l, collections.Iterable) and not isinstance(l, str):
-        map(lambda x: deep_run(func,x), l)
-    else:
-        func(l)
 
