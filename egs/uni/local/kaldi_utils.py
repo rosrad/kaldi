@@ -39,7 +39,7 @@ def write_table(f,d):
 
     with open(f, 'wb') as wf:
         for k in sorted(d):
-            v = d[k]
+            v = [ str(i) for i in d[k]]
             wf.write("%s %s\n"%(k, " ".join(v)))
     
 def ensure_dir(d):

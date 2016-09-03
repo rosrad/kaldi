@@ -4,7 +4,7 @@ import os.path as path
 from optparse import OptionParser  
 from kaldi_utils import *
 import subprocess
-
+import numpy as np
 # def pcm_pipeline(pcm, fs=16000,chan=4, byte=16):
 #     tool = "/work/local/renbo/kaldi/master//tools/pcm2wav/pcm2wav"
 #     return [tool, pcm, "- %d %d %d |"% (chan, fs, byte) ]
@@ -58,8 +58,8 @@ def build_data(src, data, ext="wav",filter=""):
             wav_dict[key] = pcm_pipeline(path.join(src, f))
             # we need the segment lable
             label = path.join(src, name+".txt")
-            segment_dict.update(segment(key, label,filter))
-
+            segment_dict.update(vad_segment(key, label,filter))
+            
 
     print ""
         
@@ -71,8 +71,11 @@ def build_data(src, data, ext="wav",filter=""):
     write_table(path.join(data,"wav.scp"), wav_dict)
     write_table(path.join(data,"segments"), segment_dict)
     doa_dict = key2doa(keys)
-    
     write_table(path.join(data,"utt2doa"), doa_dict)
+
+    vad_dict = key2vad(keys)    
+    write_table(path.join(data,"utt2vad"), vad_dict)
+
     write_table(path.join(data,"utt2spk"), doa_dict)    
     spk2utt = revert_table(doa_dict)
     write_table(path.join(data,"spk2utt"), spk2utt)    
@@ -89,6 +92,21 @@ def key2doa(keys, fixed=-1):
 
     return d
 
+def key2vad(keys, fixed=-1):
+
+    d = {}
+    for k in keys:
+        d[k] = [-1]
+
+        if k.find('SILENCE') >= 0:
+            d[k][0] =0
+        
+        if k.find('UTTERANCE') >= 0:
+            d[k][0] =1
+        
+    return d
+
+    
 # def revert_table(d):
 #     rd = {} 
 #     for k,v in d.iteritems():
@@ -97,6 +115,25 @@ def key2doa(keys, fixed=-1):
 #         else:
 #             rd[v[0]] = [k]
 #     return rd
+def vad_segment(k, f, filter=""):
+    if not path.isfile(f):
+        return {}
+    d = {}
+    # import pdb; pdb.set_trace()
+    utt = np.genfromtxt(f,dtype=[('ts',np.float), ('te',np.float), ('lab', 'S100')]).tolist()
+    pre_end=-1
+    for t in utt:
+        if t[2].find(filter) >=0:
+            utt_key = "_".join([k,"UTTERANCE", str(t[0])])
+            d[utt_key] = [k]
+            d[utt_key].extend(t[0:2])
+        if pre_end >0:          # we have previous utterance,that is, here is a silence
+            sil_key = "_".join([k,"SILENCE", str(pre_end)])
+            d[sil_key] = [k, pre_end, t[0]]
+
+        pre_end = t[1]
+
+    return d
     
 def segment(k, f, filter=""):
     if not path.isfile(f):
@@ -137,10 +174,10 @@ def build_all(src, data, ext="wav", filter=""):
 def test():
     src = "/home/renbo/work/corpus/uni_doa/recording/2016_4mic_wavs"
     data = "/home/renbo/work/uni/data/raw_gcc/recording/2016_4mic_wavs" 
-    src = "/home/renbo/work/corpus/uni_doa/recording/2016_4mic"
-    data = "/home/renbo/work/uni/data/raw_gcc/recording/2016_4mic" 
-
-    build_all(src,data, ext='pcm')
+    src = "/home/renbo/work/corpus/uni_doa/recording/20160623_4chans"
+    data = "/home/renbo/work/uni/data/test_gcc/recording/20160623_4chans" 
+    build_data(src,data, ext='pcm')
+    # build_all(src,data, ext='pcm')
 
 # test()
 
